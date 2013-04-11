@@ -9,11 +9,13 @@ module RecordGenerator
   NUM_LIBRARIES = 100
   NUM_ITEMS     = 100
   NUM_EMPLOYEES = 100
+  NUM_ACCESSES  = 100
 
   CUSTOMER_FILE = 'insert_customers.sql'
   LIBRARY_FILE  = 'insert_libraries.sql'
   ITEM_FILE     = 'insert_items.sql'
   EMPLOYEE_FILE = 'insert_employees.sql'
+  ACCESSES_FILE = 'insert_accesses.sql'
 
   MEDIA_TYPES = ['book', 'movie', 'audio']
   BOOK_GENRES = ['young adult', 'fantasy', 'sci-fi', 'non-fiction', 'fiction',
@@ -135,6 +137,20 @@ module RecordGenerator
     employees
   end
 
+  def RecordGenerator.generate_accesses(count, customers, libraries)
+    access_list = []
+    count.times do
+      accesses = nil
+      begin
+        accesses = Models::Accesses.new
+        accesses.customer_id = customers.sample.customer_id
+        accesses.library_name = libraries.sample.name
+      end while access_list.include?(accesses)
+      access_list << accesses
+    end
+    access_list
+  end
+
   def RecordGenerator.escape(value)
     if value.nil?
       'NULL'
@@ -222,11 +238,27 @@ module RecordGenerator
     statement
   end
 
+  def RecordGenerator.insert_accesses(access_list)
+    raise ArgumentError "empty array" if access_list.empty?
+    statement = "insert into Accesses (customerID, libraryName) values \n"
+    access_list.each do |accesses|
+      statement += "(#{escape accesses.customer_id}, " +
+                    "#{escape accesses.library_name})"
+      if accesses == access_list.last
+        statement += ";"
+      else
+        statement += ",\n"
+      end
+    end
+    statement
+  end
+
   if __FILE__ == $0
     customers = generate_customers(NUM_CUSTOMERS)
     libraries = generate_libraries(NUM_LIBRARIES)
     items = generate_items(NUM_ITEMS, libraries)
     employees = generate_employees(NUM_EMPLOYEES, libraries)
+    accesses = generate_accesses(NUM_ACCESSES, customers, libraries)
     File.open(CUSTOMER_FILE, 'w') do |file|
       file.puts insert_customers(customers)
     end
@@ -239,6 +271,8 @@ module RecordGenerator
     File.open(EMPLOYEE_FILE, 'w') do |file|
       file.puts insert_employees(employees)
     end
+    File.open(ACCESSES_FILE, 'w') do |file|
+      file.puts insert_accesses(accesses) end
   end
 
 end

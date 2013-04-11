@@ -243,4 +243,35 @@ module Models
       duplicate_keys?(employee)
     end
   end
+
+  class Accesses
+
+    def customer_id
+      @customer_id
+    end
+
+    def customer_id=(customer_id)
+      @customer_id = customer_id
+    end
+
+    def library_name
+      @library_name
+    end
+
+    def library_name=(library_name)
+      @library_name = library_name
+    end
+
+    def duplicate_keys?(accesses)
+      if customer_id == accesses.customer_id and library_name == accesses.library_name 
+        true
+      else
+        false
+      end
+    end
+
+    def ==(accesses)
+      duplicate_keys?(accesses)
+    end
+  end
 end
