@@ -1,9 +1,5 @@
 module Models
 
-  def Models.escape(value)
-    value.to_s.gsub("'", "''")
-  end
-
   class Library
 
     def name
@@ -39,21 +35,16 @@ module Models
     end
 
     def duplicate_keys?(library)
-      return true if name == library.name
+      if name == library.name
+        true
+      else
+        false
+      end
     end
 
     def ==(library)
       duplicate_keys?(library)
     end
-
-    def insert_statement
-      "insert into Library (name, address, city, zip) values (" +
-        "'#{Models.escape(name)}', " +
-        "'#{Models.escape(address)}', " +
-        "'#{Models.escape(city)}', " +
-        "'#{Models.escape(zip)}');"
-    end
-
   end
 
   class Customer
@@ -91,22 +82,102 @@ module Models
     end
 
     def duplicate_keys?(customer)
-      return true if customer_id == customer.customer_id
-      false
+      if customer_id == customer.customer_id
+        true
+      else
+        false
+      end
     end
 
     def ==(library)
       duplicate_keys?(library)
     end
+  end
 
-    def insert_statement
-      insert = "insert into Customer (customerID, firstName, lastName, " +
-        "birthDate) values (" +
-        "'#{Models.escape customer_id}', " +
-        "'#{Models.escape first_name}', " +
-        " '#{Models.escape last_name}', " +
-        "'#{Models.escape birth_date.iso8601}');"
+  class Item
+
+    def item_id
+      @item_id
     end
 
+    def item_id=(item_id)
+      @item_id = item_id
+    end
+
+    def library_name
+      @library_name
+    end
+
+    def library_name=(library_name)
+      @library_name = library_name
+    end
+
+    def media_type
+      @media_type
+    end
+
+    def media_type=(media_type)
+      @media_type = media_type
+    end
+
+    def author
+      @author
+    end
+
+    def author=(author)
+      @author = author
+    end
+
+    def title
+      @title
+    end
+
+    def title=(title)
+      @title = title
+    end
+
+    def year
+      @year
+    end
+
+    def year=(year)
+      @year = year
+    end
+
+    def length
+      @length
+    end
+
+    def length=(length)
+      @length = length
+    end
+
+    def genre
+      @genre
+    end
+
+    def genre=(genre)
+      @genre = genre
+    end
+
+    def artist
+      @artist
+    end
+
+    def artist=(artist)
+      @artist = artist
+    end
+
+    def duplicate_keys?(item)
+      if item_id == item.item_id and library_name == item.library_name
+        true
+      else
+        false
+      end
+    end
+
+    def ==(item)
+      duplicate_keys?(item)
+    end
   end
 end

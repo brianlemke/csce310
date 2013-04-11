@@ -7,9 +7,19 @@ module RecordGenerator
 
   NUM_CUSTOMERS = 100
   NUM_LIBRARIES = 100
+  NUM_ITEMS     = 100
 
   CUSTOMER_FILE = 'insert_customers.sql'
   LIBRARY_FILE  = 'insert_libraries.sql'
+  ITEM_FILE     = 'insert_items.sql'
+
+  MEDIA_TYPES = ['book', 'movie', 'audio']
+  BOOK_GENRES = ['young adult', 'fantasy', 'sci-fi', 'non-fiction', 'fiction',
+                 'romance', 'adventure', 'reference', 'travel', 'children']
+  MOVIE_GENRES = ['western', 'comedy', 'romance', 'sci-fi', 'drama',
+                  'documentary', 'educational']
+  AUDIO_GENRES = ['rock', 'blues', 'classical', 'metal', 'pop', 'electronic',
+                  'country', 'folk']
 
   def RecordGenerator.generate_id(digits = 20)
     id = ''
@@ -21,6 +31,14 @@ module RecordGenerator
 
   def RecordGenerator.generate_date
     Time.at(rand * Time.now.to_i).to_date
+  end
+
+  def RecordGenerator.generate_year
+    Array(1900...Time.now.year).sample
+  end
+
+  def RecordGenerator.generate_title
+    Faker::Lorem.words(Random.rand(2..6)).join(' ')
   end
 
   def RecordGenerator.generate_customers(count)
@@ -55,17 +73,122 @@ module RecordGenerator
     libraries
   end
 
-  def RecordGenerator.write_inserts(io, models)
-    models.each do |model|
-      io.puts model.insert_statement
+  def RecordGenerator.generate_items(count, libraries)
+    items = []
+    count.times do
+      item = nil
+      begin
+        item = Models::Item.new
+        item.item_id = generate_id
+        item.library_name = libraries.sample.name
+        item.media_type = MEDIA_TYPES.sample
+
+        if item.media_type == 'book'
+          item.author = Faker::Name.name
+          item.title = generate_title
+          item.year = generate_year
+          item.length = Random.rand(100..2000)
+          item.genre = BOOK_GENRES.sample
+        elsif item.media_type == 'movie'
+          item.title = generate_title
+          item.year = generate_year
+          item.length = Random.rand(10..200)
+          item.genre = MOVIE_GENRES.sample
+        elsif item.media_type == 'audio'
+          item.title = generate_title
+          item.year = generate_year
+          item.length = Random.rand(200..2000)
+          item.genre = AUDIO_GENRES.sample
+          item.artist = Faker::Name.name
+        else
+          raise Exception "Unknown media_type"
+        end
+      end while items.include?(item)
+      items << item
     end
+    items
+  end
+
+  def RecordGenerator.escape(value)
+    if value.nil?
+      'NULL'
+    else
+      value.to_s.gsub("'", "''")
+      "'" + value.to_s.gsub("'", "''") + "'"
+    end
+  end
+
+  def RecordGenerator.insert_libraries(libraries)
+    raise ArgumentError "empty array" if libraries.empty?
+    statement = "insert into Library (name, address, city, zip) values \n"
+    libraries.each do |library|
+      statement += "(#{escape library.name}, " +
+                    "#{escape library.address}, " +
+                    "#{escape library.city}, " +
+                    "#{escape library.zip})"
+      if library == libraries.last
+        statement += ";"
+      else
+        statement += ",\n"
+      end
+    end
+    statement
+  end
+
+  def RecordGenerator.insert_customers(customers)
+    raise ArgumentError "empty array" if customers.empty?
+    statement = "insert into Customer (customerID, firstName, lastName, " +
+                  "birthDate) values \n"
+    customers.each do |customer|
+      statement += "(#{escape customer.customer_id}, " +
+                    "#{escape customer.first_name}, " +
+                    "#{escape customer.last_name}, " +
+                    "#{escape customer.birth_date.iso8601})"
+      if customer == customers.last
+        statement += ";"
+      else
+        statement += ",\n"
+      end
+    end
+    statement
+  end
+
+  def RecordGenerator.insert_items(items)
+    raise ArgumentError "empty array" if items.empty?
+    statement = "insert into Item (itemID, libraryName, mediaType, author, " +
+                  "title, year, length, genre, artist) values \n"
+    items.each do |item|
+      statement += "(#{escape item.item_id}, " +
+                    "#{escape item.library_name}, " +
+                    "#{escape item.media_type}, " +
+                    "#{escape item.author}, " +
+                    "#{escape item.title}, " +
+                    "#{escape item.year}, " +
+                    "#{escape item.length}, " +
+                    "#{escape item.genre}, " +
+                    "#{escape item.artist})"
+      if item == items.last
+        statement += ";"
+      else
+        statement += ",\n"
+      end
+    end
+    statement
   end
 
   if __FILE__ == $0
     customers = generate_customers(NUM_CUSTOMERS)
     libraries = generate_libraries(NUM_LIBRARIES)
-    File.open(CUSTOMER_FILE, 'w') { |file| write_inserts(file, customers) }
-    File.open(LIBRARY_FILE, 'w') { |file| write_inserts(file, libraries) }
+    items = generate_items(NUM_ITEMS, libraries)
+    File.open(CUSTOMER_FILE, 'w') do |file|
+      file.puts insert_customers(customers)
+    end
+    File.open(LIBRARY_FILE, 'w') do |file|
+      file.puts insert_libraries(libraries)
+    end
+    File.open(ITEM_FILE, 'w') do |file|
+      file.puts insert_items(items)
+    end
   end
 
 end

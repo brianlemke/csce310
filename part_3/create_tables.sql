@@ -15,6 +15,7 @@ create table Customer (
 create table Item (
   itemID        char(20),
   libraryName   varchar(255),
+  mediaType     varchar(20),
   author        varchar(255),
   title         varchar(100),
   year          year,
