@@ -214,7 +214,7 @@ module RecordGenerator
       
       checkout.fineAmount = Random.rand(0..20)
       checkout.dateOut = generate_date
-      checkout.dateDue = generate_later_date
+      checkout.dateDue = generate_later_date(checkout.dateOut)
     end while checkouts.include?(checkout)
     checkouts << checkout
     end
