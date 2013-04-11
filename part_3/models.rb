@@ -274,7 +274,6 @@ module Models
       duplicate_keys?(accesses)
     end
   end
-end
 
   class Loan
     def lendingLibrary
