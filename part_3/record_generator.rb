@@ -3,16 +3,20 @@ require 'bundler/setup'
 require 'faker'
 require './models'
 
+# Module containing the functions to generate a set of library data. Can be
+# invoked as an executable script or used as a library.
 module RecordGenerator
 
-  NUM_CUSTOMERS = 100
-  NUM_LIBRARIES = 100
-  NUM_ITEMS     = 100
-  NUM_LOANS     = 100
+  # Set the number of records to generate for each relation
+  NUM_CUSTOMERS = 500
+  NUM_LIBRARIES = 30
+  NUM_ITEMS     = 1000
+  NUM_LOANS     = 200
   NUM_EMPLOYEES = 100
-  NUM_ACCESSES  = 100
-  NUM_CHECKOUTS = 100
+  NUM_ACCESSES  = 5000
+  NUM_CHECKOUTS = 1000
 
+  # Set the file names to write each relation to
   CUSTOMER_FILE = 'insert_customers.sql'
   LIBRARY_FILE  = 'insert_libraries.sql'
   ITEM_FILE     = 'insert_items.sql'
@@ -21,6 +25,7 @@ module RecordGenerator
   ACCESSES_FILE = 'insert_accesses.sql'
   CHECKOUT_FILE = 'insert_checkouts.sql'
 
+  # Set the permissible values for some of the relations that enumerable fields
   MEDIA_TYPES = ['book', 'movie', 'audio']
   BOOK_GENRES = ['young adult', 'fantasy', 'sci-fi', 'non-fiction', 'fiction',
                  'romance', 'adventure', 'reference', 'travel', 'children']
@@ -29,6 +34,7 @@ module RecordGenerator
   AUDIO_GENRES = ['rock', 'blues', 'classical', 'metal', 'pop', 'electronic',
                   'country', 'folk']
 
+  # Generate a string of random digits
   def RecordGenerator.generate_id(digits = 20)
     id = ''
     digits.times do
@@ -37,26 +43,37 @@ module RecordGenerator
     id
   end
 
+  # Generate a random date after 1970
   def RecordGenerator.generate_date
     Time.at(rand * Time.now.to_i).to_date
   end
 
+  # Generate a date after a given date (no more than three weeks after)
   def RecordGenerator.generate_later_date(date)
     Array((date + 1)..(date + 21)).sample
   end
 
+  # Generate a random year since 1900
   def RecordGenerator.generate_year
     Array(1900...Time.now.year).sample
   end
 
+  # Generate a Lorem Ipsum title
   def RecordGenerator.generate_title
     Faker::Lorem.words(Random.rand(2..6)).join(' ')
   end
 
+  # Generate a salary as a floating value
   def RecordGenerator.generate_salary
     Random.rand(500...10000) + Random.rand(0..100) / 100.0
   end
 
+  # Generate a fine as a floating value
+  def RecordGenerator.generate_fine
+    Random.rand(0...100) + Random.rand(0..100) / 100.0
+  end
+
+  # Generate a list of customers of size count
   def RecordGenerator.generate_customers(count)
     customers = []
     count.times do
@@ -73,6 +90,7 @@ module RecordGenerator
     customers
   end
 
+  # Generate a list of libraries of size count
   def RecordGenerator.generate_libraries(count)
     libraries = []
     count.times do
@@ -89,6 +107,7 @@ module RecordGenerator
     libraries
   end
 
+  # Generate a list of items of size count
   def RecordGenerator.generate_items(count, libraries)
     items = []
     count.times do
@@ -99,6 +118,7 @@ module RecordGenerator
         item.library_name = libraries.sample.name
         item.media_type = MEDIA_TYPES.sample
 
+        # Items need separate fields for each media type
         if item.media_type == 'book'
           item.author = Faker::Name.name
           item.title = generate_title
@@ -197,29 +217,25 @@ module RecordGenerator
     checkouts = []
     count.times do
       checkout = nil
-    begin
-      checkout = Models::Checkout.new
-      checkout.libraryName = libraries.sample.name
-      
-      #keep trying until we get a customer that is in the library
-      customer = nil
       begin
-        customer = customers.sample
-        checkout.customerID = customer.customerID
-      end until customerInLibrary(customer.customerID, checkout.libraryName, accesses)
-      
-      #keep trying until we get item in the library
-      item = nil
-      begin
-        item = items.sample
-        checkout.itemID = item.itemID
-      end until checkout.libraryName == item.libraryName
-      
-      checkout.fineAmount = Random.rand(0..20)
-      checkout.dateOut = generate_date
-      checkout.dateDue = generate_later_date(checkout.dateOut)
-    end while checkouts.include?(checkout)
-    checkouts << checkout
+        checkout = Models::Checkout.new
+        checkout.library_name = libraries.sample.name
+        
+        valid_accesses = accesses.select do |access|
+          access.library_name == checkout.library_name
+        end
+        checkout.customer_id = valid_accesses.sample.customer_id unless valid_accesses.empty?
+
+        valid_items = items.select do |item|
+          item.library_name == checkout.library_name
+        end
+        checkout.item_id = valid_items.sample.item_id unless valid_items.empty?
+
+        checkout.fine_amount = generate_fine
+        checkout.date_out = generate_date
+        checkout.date_due = generate_later_date(checkout.date_out)
+      end while checkouts.include?(checkout) or checkout.customer_id.nil? or checkout.item_id.nil?
+      checkouts << checkout
     end
     checkouts
   end
@@ -278,8 +294,8 @@ module RecordGenerator
                     "#{escape item.media_type}, " +
                     "#{escape item.author}, " +
                     "#{escape item.title}, " +
-                    "#{escape item.year}, " +
-                    "#{escape item.length}, " +
+                    "#{item.year}, " +
+                    "#{item.length}, " +
                     "#{escape item.genre}, " +
                     "#{escape item.artist})"
       if item == items.last
@@ -349,12 +365,12 @@ module RecordGenerator
     statement = "insert into Checkout (libraryName, customerID, itemID, " +
       "fineAmount, dateOut, dateDue) values \n"
     checkouts.each do |checkout|
-      statement += "(#{escape checkout.libraryName}, " + 
-                  "#{escape checkout.customerID}, " +
-            "#{escape checkout.itemID}, " +
-            "#{escape checkout.fineAmount} " +
-            "#{escape checkout.dateOut} " +
-            "#{escape checkout.dateDue})"
+      statement += "(#{escape checkout.library_name}, " + 
+                    "#{escape checkout.customer_id}, " +
+                    "#{escape checkout.item_id}, " +
+                    "#{checkout.fine_amount}, " +
+                    "#{escape checkout.date_out.iso8601}, " +
+                    "#{escape checkout.date_due.iso8601})"
       if checkout == checkouts.last
         statement += ";"
       else
@@ -365,30 +381,46 @@ module RecordGenerator
   end
 
   if __FILE__ == $0
+    puts "Generating customers..."
     customers = generate_customers(NUM_CUSTOMERS)
+    puts "Generating libraries..."
     libraries = generate_libraries(NUM_LIBRARIES)
+    puts "Generating items..."
     items = generate_items(NUM_ITEMS, libraries)
+    puts "Generating employees..."
     employees = generate_employees(NUM_EMPLOYEES, libraries)
+    puts "Generating accesses..."
     accesses = generate_accesses(NUM_ACCESSES, customers, libraries)
+    puts "Generating checkouts..."
     checkouts = generate_checkouts(NUM_CHECKOUTS, libraries, items, customers, accesses)
+    puts "Generating loans..."
     loans = generate_loans(NUM_LOANS, libraries, items)
+    puts "Done generating"
+    puts "Saving customers..."
     File.open(CUSTOMER_FILE, 'w') do |file|
       file.puts insert_customers(customers)
     end
+    puts "Saving libraries..."
     File.open(LIBRARY_FILE, 'w') do |file|
       file.puts insert_libraries(libraries)
     end
+    puts "Saving items..."
     File.open(ITEM_FILE, 'w') do |file|
       file.puts insert_items(items)
     end
+    puts "Saving employees..."
     File.open(EMPLOYEE_FILE, 'w') do |file|
       file.puts insert_employees(employees)
     end
+    puts "Saving accesses..."
     File.open(ACCESSES_FILE, 'w') do |file|
       file.puts insert_accesses(accesses)
     end
+    puts "Saving checkouts..."
     File.open(CHECKOUT_FILE, 'w') do |file|
       file.puts insert_checkouts(checkouts)
+    end
+    puts "Saving loans..."
     File.open(LOAN_FILE, 'w') do |file|
       file.puts insert_loans(loans)
     end
