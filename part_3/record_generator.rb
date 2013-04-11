@@ -162,7 +162,14 @@ module RecordGenerator
         loan.lendingLibrary = libraries.sample.name
         loan.borrowingLibrary = libraries.sample.name
         loan.dateOut = generate_date
-        loan.itemID = items.sample.itemID
+
+        #keep trying to get at item until we have one from our lending library
+        item = nil
+        begin 
+          item = items.sample
+          loan.itemID = item.itemID
+        end until loan.lendingLibrary == item.libraryName
+
       end while loans.include?(loan)
       loans << loan
     end
@@ -294,6 +301,7 @@ module RecordGenerator
     items = generate_items(NUM_ITEMS, libraries)
     employees = generate_employees(NUM_EMPLOYEES, libraries)
     accesses = generate_accesses(NUM_ACCESSES, customers, libraries)
+    loans = generate_loans(NUM_LOANS,libraries, items)
     File.open(CUSTOMER_FILE, 'w') do |file|
       file.puts insert_customers(customers)
     end
@@ -308,6 +316,9 @@ module RecordGenerator
     end
     File.open(ACCESSES_FILE, 'w') do |file|
       file.puts insert_accesses(accesses) end
+    end
+    FILE.open(LOAN_FILE, 'w') do |file|
+      file.puts insert_loans(loans) end
+    end
   end
-
 end
