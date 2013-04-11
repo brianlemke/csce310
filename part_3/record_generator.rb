@@ -11,6 +11,7 @@ module RecordGenerator
   NUM_LOANS     = 100
   NUM_EMPLOYEES = 100
   NUM_ACCESSES  = 100
+  NUM_CHECKOUTS = 100
 
   CUSTOMER_FILE = 'insert_customers.sql'
   LIBRARY_FILE  = 'insert_libraries.sql'
@@ -18,6 +19,7 @@ module RecordGenerator
   LOAN_FILE     = 'insert_loans.sql'
   EMPLOYEE_FILE = 'insert_employees.sql'
   ACCESSES_FILE = 'insert_accesses.sql'
+  CHECKOUT_FILE = 'insert_checkouts.sql'
 
   MEDIA_TYPES = ['book', 'movie', 'audio']
   BOOK_GENRES = ['young adult', 'fantasy', 'sci-fi', 'non-fiction', 'fiction',
@@ -37,6 +39,10 @@ module RecordGenerator
 
   def RecordGenerator.generate_date
     Time.at(rand * Time.now.to_i).to_date
+  end
+
+  def RecordGenerator.generate_later_date(date)
+    Array((date + 1)..(date + 21)).sample
   end
 
   def RecordGenerator.generate_year
@@ -176,6 +182,45 @@ module RecordGenerator
     loans
   end
 
+  def RecordGenerator.customerInLibrary(customerID, libraryName, accesses)
+    accesses.each do |access|
+      return true if access.customerID == customerID and access.libraryName == libraryName
+    end 
+    false
+  end
+  
+  
+  def RecordGenerator.generate_checkouts(count, libraries, items, customers, accesses)
+    checkouts = []
+    count.times do
+      checkout = nil
+    begin
+      checkout = Models::Checkout.new
+      checkout.libraryName = libraries.sample.name
+      
+      #keep trying until we get a customer that is in the library
+      customer = nil
+      begin
+        customer = customers.sample
+        checkout.customerID = customer.customerID
+      end until customerInLibrary(customer.customerID, checkout.libraryName, accesses)
+      
+      #keep trying until we get item in the library
+      item = nil
+      begin
+        item = items.sample
+        checkout.itemID = item.itemID
+      end until checkout.libraryName == item.libraryName
+      
+      checkout.fineAmount = Random.rand(0..20)
+      checkout.dateOut = generate_date
+      checkout.dateDue = generate_later_date
+    end while checkouts.include?(checkout)
+    checkouts << checkout
+    end
+    checkouts
+  end
+
   def RecordGenerator.escape(value)
     if value.nil?
       'NULL'
@@ -295,6 +340,26 @@ module RecordGenerator
     statement
   end
 
+  def RecordGenerator.insert_checkouts(checkouts)
+    raise ArguementError "empty array" if checkouts.empty?
+    statement = "insert into Checkout (libraryName, customerID, itemID, " +
+      "fineAmount, dateOut, dateDue) values \n"
+    checkouts.each do |checkout|
+      statement += "(#{escape checkout.libraryName}, " + 
+                  "#{escape checkout.customerID}, " +
+            "#{escape checkout.itemID}, " +
+            "#{escape checkout.fineAmount} " +
+            "#{escape checkout.dateOut} " +
+            "#{escape checkout.dateDue})"
+      if checkout == checkouts.last
+        statement += ";"
+      else
+        statement += ",\n"
+      end
+    end
+    statement
+  end
+
   if __FILE__ == $0
     customers = generate_customers(NUM_CUSTOMERS)
     libraries = generate_libraries(NUM_LIBRARIES)
@@ -302,6 +367,7 @@ module RecordGenerator
     employees = generate_employees(NUM_EMPLOYEES, libraries)
     accesses = generate_accesses(NUM_ACCESSES, customers, libraries)
     loans = generate_loans(NUM_LOANS,libraries, items)
+    checkouts = generate_checkouts(NUM_CHECKOUTS, libraries, items, customers, accesses)
     File.open(CUSTOMER_FILE, 'w') do |file|
       file.puts insert_customers(customers)
     end
@@ -315,10 +381,13 @@ module RecordGenerator
       file.puts insert_employees(employees)
     end
     File.open(ACCESSES_FILE, 'w') do |file|
-      file.puts insert_accesses(accesses) end
+      file.puts insert_accesses(accesses)
     end
     FILE.open(LOAN_FILE, 'w') do |file|
-      file.puts insert_loans(loans) end
+      file.puts insert_loans(loans)
+    end
+    File.open(CHECKOUT_FILE, 'w') do |file|
+      file.puts insert_checkouts(checkouts)
     end
   end
 end
