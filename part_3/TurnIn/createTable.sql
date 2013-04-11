@@ -1,5 +1,3 @@
-USE mtm2465-310db;
-
 DROP TABLE IF EXISTS Library;
 
 create table Library (
