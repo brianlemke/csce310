@@ -316,4 +316,67 @@ module Models
       duplicate_keys?(loan)
     end
   end
+  
+  class Checkout
+  
+    def library_name
+      @library_name
+    end
+
+    def library_name=(library_name)
+      @library_name = library_name
+    end
+
+    def customer_id
+      @customer_id
+    end
+
+    def customer_id=(customer_id)
+      @customer_id = customer_id
+    end
+  
+    def item_id
+      @item_id
+    end
+
+    def item_id=(item_id)
+      @item_id = item_id
+    end
+	
+    def fineAmount
+	  @fineAmount
+  	end
+  	
+  	def fineAmount=(fineAmount)
+  	  @fineAmount = fineAmount
+  	end
+  	
+  	def dateOut
+  	  @dateOut
+  	end
+  	
+  	def dateOut=(dateOut)
+  	  @dateOut = dateOut
+  	end
+  	
+  	def dateDue
+  	  @dateDue
+  	end
+  	
+  	def dateDue=(dateDue)
+  	  @dateDue= dateDue
+  	end
+  	
+  	def duplicate_keys?(checkout)
+  	  if item_id == checkout.item_id and library_name == checkout.library_name and dateOut = checkout.dateOut
+  	    true
+  	  else
+  	    false
+  	  end
+  	end
+  	
+  	def ==(checkout)
+  	  duplicate_keys?(checkout)
+  	end
+  end
 end
