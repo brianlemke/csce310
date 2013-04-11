@@ -3,3 +3,4 @@
 \. insert_items.sql
 \. insert_employees.sql
 \. insert_accesses.sql
+\. insert_checkouts.sql
