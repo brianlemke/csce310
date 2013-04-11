@@ -161,22 +161,25 @@ module RecordGenerator
 
   def RecordGenerator.generate_loans(count, libraries, items)
     loans = []
-    count.loans do
+    count.times do
       loan = nil
       begin
         loan = Models::Loan.new
-        loan.lendingLibrary = libraries.sample.name
-        loan.borrowingLibrary = libraries.sample.name
-        loan.dateOut = generate_date
+        loan.lending_library = libraries.sample.name
 
-        #keep trying to get at item until we have one from our lending library
-        item = nil
-        begin 
-          item = items.sample
-          loan.itemID = item.itemID
-        end until loan.lendingLibrary == item.libraryName
+        valid_borrowers = libraries.reject do |library|
+          library.name == loan.lending_library
+        end
+        loan.borrowing_library = valid_borrowers.sample.name
 
-      end while loans.include?(loan)
+        loan.date_out = generate_date
+
+        valid_items = items.select do |item|
+          item.library_name == loan.lending_library
+        end
+
+        loan.item_id = valid_items.sample.item_id unless valid_items.empty?
+      end while loans.include?(loan) or loan.item_id.nil?
       loans << loan
     end
     loans
@@ -290,13 +293,14 @@ module RecordGenerator
 
   def RecordGenerator.insert_loans(loans)
     raise ArgumentError "empty array" if loans.empty?
-    statement = "insert into Loan (lendingLibrary, borrowingLibrary, dateOut, itemId) values \n"
+    statement = "insert into Loan (lendingLibrary, borrowingLibrary, dateOut, " +
+                  "itemID) values \n"
     loans.each do |loan|
-      statement += "(#{escape loan.lendingLibrary}, "+
-                    "#{escape loan.borrowingLibrary},"+
-                    "#{escape loan.dateOut},"+
-                    "#{escape loan.itemId})"
-      if item == items.last
+      statement += "(#{escape loan.lending_library}, "+
+                    "#{escape loan.borrowing_library}, " +
+                    "#{escape loan.date_out.iso8601}, " +
+                    "#{escape loan.item_id})"
+      if loan == loans.last
         statement += ";"
       else
         statement += ",\n"
@@ -366,8 +370,8 @@ module RecordGenerator
     items = generate_items(NUM_ITEMS, libraries)
     employees = generate_employees(NUM_EMPLOYEES, libraries)
     accesses = generate_accesses(NUM_ACCESSES, customers, libraries)
-    loans = generate_loans(NUM_LOANS,libraries, items)
     checkouts = generate_checkouts(NUM_CHECKOUTS, libraries, items, customers, accesses)
+    loans = generate_loans(NUM_LOANS, libraries, items)
     File.open(CUSTOMER_FILE, 'w') do |file|
       file.puts insert_customers(customers)
     end
@@ -383,11 +387,10 @@ module RecordGenerator
     File.open(ACCESSES_FILE, 'w') do |file|
       file.puts insert_accesses(accesses)
     end
-    FILE.open(LOAN_FILE, 'w') do |file|
-      file.puts insert_loans(loans)
-    end
     File.open(CHECKOUT_FILE, 'w') do |file|
       file.puts insert_checkouts(checkouts)
+    File.open(LOAN_FILE, 'w') do |file|
+      file.puts insert_loans(loans)
     end
   end
 end

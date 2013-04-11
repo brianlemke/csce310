@@ -276,36 +276,41 @@ module Models
   end
 
   class Loan
-    def lendingLibrary
-      @lendingLibrary
+    def lending_library
+      @lending_library
     end
-    def lendingLibrary=(lendingLibrary)
-      @lendingLibrary = lendingLibrary
-    end
-
-    def borrowingLibrary
-      @borrowingLibrary
-    end
-    def borrowingLibrary=(borrowingLibrary)
-      @borrowingLibrary
+    def lending_library=(lending_library)
+      @lending_library = lending_library
     end
 
-    def dateOut
-      @dateOut
-    end
-    def dateOut=(dateOut)
-      @dateOut      
+    def borrowing_library
+      @borrowing_library
     end
 
-    def itemID
-      @itemID
+    def borrowing_library=(borrowing_library)
+      @borrowing_library = borrowing_library
     end
-    def itemID=(itemID)
-      @itemID
+
+    def date_out
+      @date_out
+    end
+
+    def date_out=(date_out)
+      @date_out = date_out
+    end
+
+    def item_id
+      @item_id
+    end
+
+    def item_id=(item_id)
+      @item_id = item_id
     end
 
     def duplicate_keys?(loan)
-      if lendingLibrary == loan.lendingLibrary and dateOut == loan.dateOut and itemId = loan.itemId
+      if lending_library == loan.lending_library and
+         date_out == loan.date_out and
+         item_id == loan.item_id
         true
       else
         false
