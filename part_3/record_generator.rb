@@ -5,6 +5,12 @@ require './models'
 
 module RecordGenerator
 
+  NUM_CUSTOMERS = 100
+  NUM_LIBRARIES = 100
+
+  CUSTOMER_FILE = 'insert_customers.sql'
+  LIBRARY_FILE  = 'insert_libraries.sql'
+
   def RecordGenerator.generate_id(digits = 20)
     id = ''
     digits.times do
@@ -33,14 +39,33 @@ module RecordGenerator
     customers
   end
 
-  def RecordGenerator::write_customers(io, customers)
-    customers.each do |customer|
-      io.puts customer.insert_statement
+  def RecordGenerator.generate_libraries(count)
+    libraries = []
+    count.times do
+      library = nil
+      begin
+        library = Models::Library.new
+        library.name = Faker::Company.name
+        library.address = Faker::Address.street_address
+        library.city = Faker::Address.city
+        library.zip = Faker::Address.zip_code
+      end while libraries.include?(library)
+      libraries << library
+    end
+    libraries
+  end
+
+  def RecordGenerator.write_inserts(io, models)
+    models.each do |model|
+      io.puts model.insert_statement
     end
   end
 
   if __FILE__ == $0
-    write_customers($stdout, generate_customers(100))
+    customers = generate_customers(NUM_CUSTOMERS)
+    libraries = generate_libraries(NUM_LIBRARIES)
+    File.open(CUSTOMER_FILE, 'w') { |file| write_inserts(file, customers) }
+    File.open(LIBRARY_FILE, 'w') { |file| write_inserts(file, libraries) }
   end
 
 end
