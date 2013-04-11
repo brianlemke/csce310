@@ -8,12 +8,14 @@ module RecordGenerator
   NUM_CUSTOMERS = 100
   NUM_LIBRARIES = 100
   NUM_ITEMS     = 100
+  NUM_LOANS     = 100
   NUM_EMPLOYEES = 100
   NUM_ACCESSES  = 100
 
   CUSTOMER_FILE = 'insert_customers.sql'
   LIBRARY_FILE  = 'insert_libraries.sql'
   ITEM_FILE     = 'insert_items.sql'
+  LOAN_FILE     = 'insert_loans.sql'
   EMPLOYEE_FILE = 'insert_employees.sql'
   ACCESSES_FILE = 'insert_accesses.sql'
 
@@ -151,6 +153,22 @@ module RecordGenerator
     access_list
   end
 
+  def RecordGenerator.generate_loans(count, libraries, items)
+    loans = []
+    count.loans do
+      loan = nil
+      begin
+        loan = Models::Loan.new
+        loan.lendingLibrary = libraries.sample.name
+        loan.borrowingLibrary = libraries.sample.name
+        loan.dateOut = generate_date
+        loan.itemID = items.sample.itemID
+      end while loans.include?(loan)
+      loans << loan
+    end
+    loans
+  end
+
   def RecordGenerator.escape(value)
     if value.nil?
       'NULL'
@@ -209,6 +227,23 @@ module RecordGenerator
                     "#{escape item.length}, " +
                     "#{escape item.genre}, " +
                     "#{escape item.artist})"
+      if item == items.last
+        statement += ";"
+      else
+        statement += ",\n"
+      end
+    end
+    statement
+  end
+
+  def RecordGenerator.insert_loans(loans)
+    raise ArgumentError "empty array" if loans.empty?
+    statement = "insert into Loan (lendingLibrary, borrowingLibrary, dateOut, itemId) values \n"
+    loans.each do |loan|
+      statement += "(#{escape loan.lendingLibrary}, "+
+                    "#{escape loan.borrowingLibrary},"+
+                    "#{escape loan.dateOut},"+
+                    "#{escape loan.itemId})"
       if item == items.last
         statement += ";"
       else
