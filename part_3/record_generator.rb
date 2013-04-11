@@ -8,10 +8,12 @@ module RecordGenerator
   NUM_CUSTOMERS = 100
   NUM_LIBRARIES = 100
   NUM_ITEMS     = 100
+  NUM_EMPLOYEES = 100
 
   CUSTOMER_FILE = 'insert_customers.sql'
   LIBRARY_FILE  = 'insert_libraries.sql'
   ITEM_FILE     = 'insert_items.sql'
+  EMPLOYEE_FILE = 'insert_employees.sql'
 
   MEDIA_TYPES = ['book', 'movie', 'audio']
   BOOK_GENRES = ['young adult', 'fantasy', 'sci-fi', 'non-fiction', 'fiction',
@@ -39,6 +41,10 @@ module RecordGenerator
 
   def RecordGenerator.generate_title
     Faker::Lorem.words(Random.rand(2..6)).join(' ')
+  end
+
+  def RecordGenerator.generate_salary
+    Random.rand(500...10000) + Random.rand(0..100) / 100.0
   end
 
   def RecordGenerator.generate_customers(count)
@@ -109,6 +115,26 @@ module RecordGenerator
     items
   end
 
+  def RecordGenerator.generate_employees(count, libraries)
+    employees = []
+    count.times do
+      employee = nil
+      begin
+        employee = Models::Employee.new
+        employee.employee_id = generate_id
+        employee.last_name = Faker::Name.last_name
+        employee.first_name = Faker::Name.first_name
+        employee.title = Faker::Name.title
+        employee.salary = generate_salary
+        if Random.rand(10) != 0
+          employee.library_name = libraries.sample.name
+        end
+      end while employees.include?(employee)
+      employees << employee
+    end
+    employees
+  end
+
   def RecordGenerator.escape(value)
     if value.nil?
       'NULL'
@@ -176,10 +202,31 @@ module RecordGenerator
     statement
   end
 
+  def RecordGenerator.insert_employees(employees)
+    raise ArgumentError "empty array" if employees.empty?
+    statement = "insert into Employee (employeeID, lastName, firstName, " +
+                  "title, salary, libraryName) values \n"
+    employees.each do |employee|
+      statement += "(#{escape employee.employee_id}, " +
+                    "#{escape employee.last_name}, " +
+                    "#{escape employee.first_name}, " +
+                    "#{escape employee.title}, " +
+                    "#{employee.salary}, " +
+                    "#{escape employee.library_name})"
+      if employee == employees.last
+        statement += ";"
+      else
+        statement += ",\n"
+      end
+    end
+    statement
+  end
+
   if __FILE__ == $0
     customers = generate_customers(NUM_CUSTOMERS)
     libraries = generate_libraries(NUM_LIBRARIES)
     items = generate_items(NUM_ITEMS, libraries)
+    employees = generate_employees(NUM_EMPLOYEES, libraries)
     File.open(CUSTOMER_FILE, 'w') do |file|
       file.puts insert_customers(customers)
     end
@@ -188,6 +235,9 @@ module RecordGenerator
     end
     File.open(ITEM_FILE, 'w') do |file|
       file.puts insert_items(items)
+    end
+    File.open(EMPLOYEE_FILE, 'w') do |file|
+      file.puts insert_employees(employees)
     end
   end
 

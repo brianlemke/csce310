@@ -180,4 +180,67 @@ module Models
       duplicate_keys?(item)
     end
   end
+
+  class Employee
+
+    def employee_id
+      @employee_id
+    end
+
+    def employee_id=(employee_id)
+      @employee_id = employee_id
+    end
+
+    def last_name
+      @last_name
+    end
+
+    def last_name=(last_name)
+      @last_name = last_name
+    end
+
+    def first_name
+      @first_name
+    end
+
+    def first_name=(first_name)
+      @first_name = first_name
+    end
+
+    def title
+      @title
+    end
+
+    def title=(title)
+      @title = title
+    end
+
+    def salary
+      @salary
+    end
+
+    def salary=(salary)
+      @salary = salary
+    end
+
+    def library_name
+      @library_name
+    end
+
+    def library_name=(library_name)
+      @library_name = library_name
+    end
+
+    def duplicate_keys?(employee)
+      if employee_id == employee.employee_id
+        true
+      else
+        false
+      end
+    end
+
+    def ==(employee)
+      duplicate_keys?(employee)
+    end
+  end
 end
