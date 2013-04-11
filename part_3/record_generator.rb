@@ -145,6 +145,8 @@ module RecordGenerator
     items
   end
 
+  # Generate a list of employees of size count. Most employees will belong to
+  # one of the libraries, but some will not.
   def RecordGenerator.generate_employees(count, libraries)
     employees = []
     count.times do
@@ -165,6 +167,8 @@ module RecordGenerator
     employees
   end
 
+  # Generate a list of accesses of size count. All accesses will have a valid
+  # customer and library from the provided list.
   def RecordGenerator.generate_accesses(count, customers, libraries)
     access_list = []
     count.times do
@@ -179,6 +183,8 @@ module RecordGenerator
     access_list
   end
 
+  # Generate a list of loans of size count. All loans will have valid libraries
+  # and items.
   def RecordGenerator.generate_loans(count, libraries, items)
     loans = []
     count.times do
@@ -187,6 +193,8 @@ module RecordGenerator
         loan = Models::Loan.new
         loan.lending_library = libraries.sample.name
 
+        # Ensure that the borrowing library is different from the lending
+        # library
         valid_borrowers = libraries.reject do |library|
           library.name == loan.lending_library
         end
@@ -194,10 +202,10 @@ module RecordGenerator
 
         loan.date_out = generate_date
 
+        # Ensure that the item belongs to the lending library
         valid_items = items.select do |item|
           item.library_name == loan.lending_library
         end
-
         loan.item_id = valid_items.sample.item_id unless valid_items.empty?
       end while loans.include?(loan) or loan.item_id.nil?
       loans << loan
@@ -205,14 +213,9 @@ module RecordGenerator
     loans
   end
 
-  def RecordGenerator.customerInLibrary(customerID, libraryName, accesses)
-    accesses.each do |access|
-      return true if access.customerID == customerID and access.libraryName == libraryName
-    end 
-    false
-  end
   
-  
+  # Generate a list of checkouts of size count. All checkouts will have valid
+  # customers, libraries, and items.
   def RecordGenerator.generate_checkouts(count, libraries, items, customers, accesses)
     checkouts = []
     count.times do
@@ -221,11 +224,13 @@ module RecordGenerator
         checkout = Models::Checkout.new
         checkout.library_name = libraries.sample.name
         
+        # Ensure that the customer has access to the library
         valid_accesses = accesses.select do |access|
           access.library_name == checkout.library_name
         end
         checkout.customer_id = valid_accesses.sample.customer_id unless valid_accesses.empty?
 
+        # Ensure that the item belongs to the library
         valid_items = items.select do |item|
           item.library_name == checkout.library_name
         end
@@ -240,6 +245,8 @@ module RecordGenerator
     checkouts
   end
 
+  # Replace all single quotes with two single quotes. Surround the string with
+  # single quotes.
   def RecordGenerator.escape(value)
     if value.nil?
       'NULL'
@@ -249,6 +256,7 @@ module RecordGenerator
     end
   end
 
+  # Create an insert into command for the libraries list.
   def RecordGenerator.insert_libraries(libraries)
     raise ArgumentError "empty array" if libraries.empty?
     statement = "insert into Library (name, address, city, zip) values \n"
@@ -266,6 +274,7 @@ module RecordGenerator
     statement
   end
 
+  # Create an insert into command for the customers list.
   def RecordGenerator.insert_customers(customers)
     raise ArgumentError "empty array" if customers.empty?
     statement = "insert into Customer (customerID, firstName, lastName, " +
@@ -284,6 +293,7 @@ module RecordGenerator
     statement
   end
 
+  # Create an insert into command for the items list.
   def RecordGenerator.insert_items(items)
     raise ArgumentError "empty array" if items.empty?
     statement = "insert into Item (itemID, libraryName, mediaType, author, " +
@@ -307,6 +317,7 @@ module RecordGenerator
     statement
   end
 
+  # Create an insert into command for the loans list.
   def RecordGenerator.insert_loans(loans)
     raise ArgumentError "empty array" if loans.empty?
     statement = "insert into Loan (lendingLibrary, borrowingLibrary, dateOut, " +
@@ -325,6 +336,7 @@ module RecordGenerator
     statement
   end
 
+  # Create an insert into command for the employees list
   def RecordGenerator.insert_employees(employees)
     raise ArgumentError "empty array" if employees.empty?
     statement = "insert into Employee (employeeID, lastName, firstName, " +
@@ -345,6 +357,7 @@ module RecordGenerator
     statement
   end
 
+  # Create an insert into command for the accesses list
   def RecordGenerator.insert_accesses(access_list)
     raise ArgumentError "empty array" if access_list.empty?
     statement = "insert into Accesses (customerID, libraryName) values \n"
@@ -360,6 +373,7 @@ module RecordGenerator
     statement
   end
 
+  # Create an insert into command for the checkouts list
   def RecordGenerator.insert_checkouts(checkouts)
     raise ArguementError "empty array" if checkouts.empty?
     statement = "insert into Checkout (libraryName, customerID, itemID, " +
@@ -380,7 +394,10 @@ module RecordGenerator
     statement
   end
 
+  # If we are running this file as a script, then generate all the data and
+  # write it to insert files. Otherwise, do nothing (act as a library).
   if __FILE__ == $0
+    # Generate arrays in order of dependencies
     puts "Generating customers..."
     customers = generate_customers(NUM_CUSTOMERS)
     puts "Generating libraries..."
@@ -396,6 +413,8 @@ module RecordGenerator
     puts "Generating loans..."
     loans = generate_loans(NUM_LOANS, libraries, items)
     puts "Done generating"
+
+    # Write the generated insert into commands to a files
     puts "Saving customers..."
     File.open(CUSTOMER_FILE, 'w') do |file|
       file.puts insert_customers(customers)
@@ -424,5 +443,6 @@ module RecordGenerator
     File.open(LOAN_FILE, 'w') do |file|
       file.puts insert_loans(loans)
     end
+    puts "Done"
   end
 end
