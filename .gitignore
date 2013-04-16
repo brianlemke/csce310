@@ -1,5 +1,5 @@
 part_1/Thumbs.db
 
-# Ignore shell scripts that are machine-specific
-populate_*.sh
+# Ignore scripts that are machine-specific
+*.sh
 reset_db.sql
