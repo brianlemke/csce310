@@ -411,7 +411,7 @@ module Models
     def duplicate_keys?(checkout)
       if item_id == checkout.item_id and
          library_name == checkout.library_name and
-         date_out = checkout.date_out
+         date_out == checkout.date_out
         true
       else
         false

@@ -14,7 +14,7 @@ module RecordGenerator
   NUM_LOANS     = 200
   NUM_EMPLOYEES = 100
   NUM_ACCESSES  = 5000
-  NUM_CHECKOUTS = 1000
+  NUM_CHECKOUTS = 2000
 
   # Set the file names to write each relation to
   CUSTOMER_FILE = 'insert_customers.sql'
