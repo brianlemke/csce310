@@ -1,4 +1,0 @@
-
-SELECT * FROM Customer;
-DELETE FROM Customer WHERE customerID == 30003300033000330003;
-SLECT * FROM Customer;

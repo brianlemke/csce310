@@ -1,0 +1,4 @@
+
+SELECT * FROM Customer;
+DELETE FROM Customer WHERE customerID == 61440054698060262440;
+SLECT * FROM Customer;
