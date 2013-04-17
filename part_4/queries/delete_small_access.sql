@@ -1,4 +1,4 @@
 
 SELECT * FROM Accesses;
 DELETE FROM Accesses WHERE customerID = '30003300033000330003';
-SLECT * FROM Accesses;
+SELECT * FROM Accesses;
