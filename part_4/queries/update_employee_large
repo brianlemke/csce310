@@ -1,0 +1,4 @@
+select * from Employee
+update Employee set title='Professional Librarian'
+WHERE lastName='Schiller' and firstName = 'Clark'
+select * from Employee
