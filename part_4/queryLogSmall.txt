@@ -1,0 +1,181 @@
+--------------
+select name as libraryName, count(itemID) as numBooks
+from Library, Item
+where Library.name = Item.libraryName and Item.mediaType = 'book'
+group by Library.name
+--------------
+
++----------------------+----------+
+| libraryName          | numBooks |
++----------------------+----------+
+| Green Public Library |        1 |
+| John Hopkins Library |        1 |
++----------------------+----------+
+2 rows in set (0.00 sec)
+
+--------------
+select *
+from Item
+where not exists(select *
+                 from Checkout
+                 where Checkout.itemID = Item.itemID and
+                       Checkout.libraryName = Item.libraryName
+                )
+--------------
+
++----------------------+-----------------------+-----------+--------------+-------------------------------------------+------+--------+---------+--------+
+| itemID               | libraryName           | mediaType | author       | title                                     | year | length | genre   | artist |
++----------------------+-----------------------+-----------+--------------+-------------------------------------------+------+--------+---------+--------+
+| MOOO-1940-0000-0202A | Creative Name Library | audio     | J.K. Rowling | Harry Potter and The Order of the Phoneix | 2003 |   1620 | fiction | NULL   |
++----------------------+-----------------------+-----------+--------------+-------------------------------------------+------+--------+---------+--------+
+1 row in set (0.00 sec)
+
+--------------
+select Customer.customerID, firstName, lastName, sum(fineAmount) as totalFines
+from Customer, Checkout
+where Customer.customerID = Checkout.customerID
+group by Customer.customerID, firstName, lastName
+having sum(fineAmount) > 200.00
+--------------
+
+Empty set (0.01 sec)
+
+--------------
+select Library.name, avg(Employee.salary) as averageSalary
+from Library, Employee
+where Library.name = Employee.libraryName
+group by Library.name
+having avg(Employee.salary) >= all (select avg(Employee.salary)
+                                    from Library, Employee
+                                    where Library.name = Employee.libraryName
+                                    group by Library.name)
+--------------
+
++----------------------+---------------+
+| name                 | averageSalary |
++----------------------+---------------+
+| Green Public Library |         58000 |
++----------------------+---------------+
+1 row in set (0.02 sec)
+
+--------------
+select Item.itemID, Item.libraryName, Item.title
+from Item, Checkout
+where Item.itemID = Checkout.itemID and
+      Item.libraryName = Checkout.libraryName and
+      Checkout.dateOut >= date_sub(curdate(), interval 1 year)
+union
+select Item.itemID, Item.libraryName, Item.title
+from Item, Loan
+where Item.itemID = Loan.itemID and
+      Item.libraryName = Loan.lendingLibrary and
+      Loan.dateOut >= date_sub(curdate(), interval 1 year)
+--------------
+
++----------------------+-------------------------+-------------------------------------------+
+| itemID               | libraryName             | title                                     |
++----------------------+-------------------------+-------------------------------------------+
+| APCO-1830-0000-2101A | John Hopkins Library    | Where the Wild Things Are                 |
+| FGJA-8410-0000-0010J | National Public Library | Live Free or Die Hard                     |
+| ZDAB-8521-0000-0001A | Yellow Public Library   | The Graduate                              |
+| MOOO-1940-0000-0202A | Creative Name Library   | Harry Potter and The Order of the Phoneix |
++----------------------+-------------------------+-------------------------------------------+
+4 rows in set (0.01 sec)
+
+--------------
+select distinct author
+from Item
+where mediaType = 'book'
+order by author
+--------------
+
++------------------------+
+| author                 |
++------------------------+
+| Aleksandr Solzhenitsyn |
+| Maurice Sendak         |
++------------------------+
+2 rows in set (0.00 sec)
+
+--------------
+select Item.itemID, Item.libraryName, Item.title, count(Checkout.dateOut) as timesCheckedOut
+from Item left join Checkout on
+     Item.itemID = Checkout.itemID and Item.libraryName = Checkout.libraryName
+group by Item.itemID, Item.libraryName, Item.title
+order by count(Checkout.dateOut) desc
+--------------
+
++----------------------+-------------------------+-------------------------------------------+-----------------+
+| itemID               | libraryName             | title                                     | timesCheckedOut |
++----------------------+-------------------------+-------------------------------------------+-----------------+
+| APCO-1830-0000-2101A | John Hopkins Library    | Where the Wild Things Are                 |               2 |
+| AAAD-1001-0000-1101Z | Green Public Library    | One Day in the Life of Ivan Denisovich    |               1 |
+| FGJA-8410-0000-0010J | National Public Library | Live Free or Die Hard                     |               1 |
+| ZDAB-8521-0000-0001A | Yellow Public Library   | The Graduate                              |               1 |
+| MOOO-1940-0000-0202A | Creative Name Library   | Harry Potter and The Order of the Phoneix |               0 |
++----------------------+-------------------------+-------------------------------------------+-----------------+
+5 rows in set (0.00 sec)
+
+--------------
+select customerID, firstName, lastName, libraryName, count(itemID) as numMovies
+from Customer natural join Checkout c1 natural join Item
+where mediaType = 'movie'
+group by customerID, firstName, lastName, libraryName
+having count(itemID) >= all (select count(itemID)
+                             from Checkout natural join Item
+                             where libraryName = c1.libraryName and
+                                   mediaType = 'movie'
+                             group by customerID
+                            )
+order by libraryName
+--------------
+
++----------------------+-----------+----------+-------------------------+-----------+
+| customerID           | firstName | lastName | libraryName             | numMovies |
++----------------------+-----------+----------+-------------------------+-----------+
+| 30003300033000330003 | Baratheon | Joeffery | National Public Library |         1 |
+| 20002200022000220002 | Bravo     | Johnny   | Yellow Public Library   |         1 |
++----------------------+-----------+----------+-------------------------+-----------+
+2 rows in set (0.02 sec)
+
+--------------
+select *
+from Employee
+where libraryName in (select Library.name
+                      from Library, Checkout
+                      where Library.name = Checkout.libraryName
+                      group by Library.name
+                      having count(itemID) >= all (select count(itemID)
+                                                   from Library, Checkout
+                                                   where Library.name = Checkout.libraryName
+                                                   group by Library.name
+                                                  )
+                     )
+--------------
+
++----------------------+----------+-----------+-----------+--------+----------------------+
+| employeeID           | lastName | firstName | title     | salary | libraryName          |
++----------------------+----------+-----------+-----------+--------+----------------------+
+| 40000500006000070000 | Frank    | James     | Librarian |  35000 | John Hopkins Library |
++----------------------+----------+-----------+-----------+--------+----------------------+
+1 row in set (0.00 sec)
+
+--------------
+select Item.itemID, title, mediaType
+from Item join
+     Checkout on Item.itemID = Checkout.itemID join
+     Loan on Checkout.itemID = Loan.itemID
+--------------
+
++----------------------+----------------------------------------+-----------+
+| itemID               | title                                  | mediaType |
++----------------------+----------------------------------------+-----------+
+| AAAD-1001-0000-1101Z | One Day in the Life of Ivan Denisovich | book      |
+| APCO-1830-0000-2101A | Where the Wild Things Are              | book      |
+| APCO-1830-0000-2101A | Where the Wild Things Are              | book      |
+| FGJA-8410-0000-0010J | Live Free or Die Hard                  | movie     |
+| ZDAB-8521-0000-0001A | The Graduate                           | movie     |
++----------------------+----------------------------------------+-----------+
+5 rows in set (0.00 sec)
+
+Bye

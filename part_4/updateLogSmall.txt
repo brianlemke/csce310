@@ -1,0 +1,222 @@
+--------------
+select * from Employee
+--------------
+
++----------------------+------------+-----------+------------------+---------+-------------------------+
+| employeeID           | lastName   | firstName | title            | salary  | libraryName             |
++----------------------+------------+-----------+------------------+---------+-------------------------+
+| 10000200003000040000 | McInnis    | Jamie     | Head Librarian   |   58000 | Green Public Library    |
+| 20000300004000050000 | Kramer     | Arnold    | Senior Librarian |   45581 | Yellow Public Library   |
+| 30000400005000060000 | Christmas  | Mary      | Stocker          |  2250.5 | National Public Library |
+| 40000500006000070000 | Frank      | James     | Librarian        |   35000 | John Hopkins Library    |
+| 50000600007000080000 | Babbington | Thomas    | Receptionist     | 51000.2 | Creative Name Library   |
+| 84297293194873240982 | MacRyrie   | George    | Security Guard   |    4000 | NULL                    |
++----------------------+------------+-----------+------------------+---------+-------------------------+
+6 rows in set (0.00 sec)
+
+--------------
+update Employee
+set salary = salary / 2
+where libraryName is null
+--------------
+
+Query OK, 1 row affected (0.01 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+--------------
+select * from Employee
+--------------
+
++----------------------+------------+-----------+------------------+---------+-------------------------+
+| employeeID           | lastName   | firstName | title            | salary  | libraryName             |
++----------------------+------------+-----------+------------------+---------+-------------------------+
+| 10000200003000040000 | McInnis    | Jamie     | Head Librarian   |   58000 | Green Public Library    |
+| 20000300004000050000 | Kramer     | Arnold    | Senior Librarian |   45581 | Yellow Public Library   |
+| 30000400005000060000 | Christmas  | Mary      | Stocker          |  2250.5 | National Public Library |
+| 40000500006000070000 | Frank      | James     | Librarian        |   35000 | John Hopkins Library    |
+| 50000600007000080000 | Babbington | Thomas    | Receptionist     | 51000.2 | Creative Name Library   |
+| 84297293194873240982 | MacRyrie   | George    | Security Guard   |    2000 | NULL                    |
++----------------------+------------+-----------+------------------+---------+-------------------------+
+6 rows in set (0.00 sec)
+
+--------------
+select * from Item
+--------------
+
++----------------------+-------------------------+-----------+------------------------+-------------------------------------------+------+--------+---------+--------+
+| itemID               | libraryName             | mediaType | author                 | title                                     | year | length | genre   | artist |
++----------------------+-------------------------+-----------+------------------------+-------------------------------------------+------+--------+---------+--------+
+| AAAD-1001-0000-1101Z | Green Public Library    | book      | Aleksandr Solzhenitsyn | One Day in the Life of Ivan Denisovich    | 1962 |   NULL | fiction | NULL   |
+| APCO-1830-0000-2101A | John Hopkins Library    | book      | Maurice Sendak         | Where the Wild Things Are                 | 1963 |   NULL | fantasy | NULL   |
+| FGJA-8410-0000-0010J | National Public Library | movie     | NULL                   | Live Free or Die Hard                     | 2007 |    129 | action  | NULL   |
+| MOOO-1940-0000-0202A | Creative Name Library   | audio     | J.K. Rowling           | Harry Potter and The Order of the Phoneix | 2003 |   1620 | fiction | NULL   |
+| ZDAB-8521-0000-0001A | Yellow Public Library   | movie     | NULL                   | The Graduate                              | 1967 |    108 | drama   | NULL   |
++----------------------+-------------------------+-----------+------------------------+-------------------------------------------+------+--------+---------+--------+
+5 rows in set (0.01 sec)
+
+--------------
+update Item
+set title = concat('"', title, '"')
+where mediaType = 'movie' and
+      title not like '"%"'
+--------------
+
+Query OK, 2 rows affected (0.00 sec)
+Rows matched: 2  Changed: 2  Warnings: 0
+
+--------------
+select * from Item
+--------------
+
++----------------------+-------------------------+-----------+------------------------+-------------------------------------------+------+--------+---------+--------+
+| itemID               | libraryName             | mediaType | author                 | title                                     | year | length | genre   | artist |
++----------------------+-------------------------+-----------+------------------------+-------------------------------------------+------+--------+---------+--------+
+| AAAD-1001-0000-1101Z | Green Public Library    | book      | Aleksandr Solzhenitsyn | One Day in the Life of Ivan Denisovich    | 1962 |   NULL | fiction | NULL   |
+| APCO-1830-0000-2101A | John Hopkins Library    | book      | Maurice Sendak         | Where the Wild Things Are                 | 1963 |   NULL | fantasy | NULL   |
+| FGJA-8410-0000-0010J | National Public Library | movie     | NULL                   | "Live Free or Die Hard"                   | 2007 |    129 | action  | NULL   |
+| MOOO-1940-0000-0202A | Creative Name Library   | audio     | J.K. Rowling           | Harry Potter and The Order of the Phoneix | 2003 |   1620 | fiction | NULL   |
+| ZDAB-8521-0000-0001A | Yellow Public Library   | movie     | NULL                   | "The Graduate"                            | 1967 |    108 | drama   | NULL   |
++----------------------+-------------------------+-----------+------------------------+-------------------------------------------+------+--------+---------+--------+
+5 rows in set (0.00 sec)
+
+--------------
+select * from Item
+--------------
+
++----------------------+-------------------------+-----------+------------------------+-------------------------------------------+------+--------+---------+--------+
+| itemID               | libraryName             | mediaType | author                 | title                                     | year | length | genre   | artist |
++----------------------+-------------------------+-----------+------------------------+-------------------------------------------+------+--------+---------+--------+
+| AAAD-1001-0000-1101Z | Green Public Library    | book      | Aleksandr Solzhenitsyn | One Day in the Life of Ivan Denisovich    | 1962 |   NULL | fiction | NULL   |
+| APCO-1830-0000-2101A | John Hopkins Library    | book      | Maurice Sendak         | Where the Wild Things Are                 | 1963 |   NULL | fantasy | NULL   |
+| FGJA-8410-0000-0010J | National Public Library | movie     | NULL                   | "Live Free or Die Hard"                   | 2007 |    129 | action  | NULL   |
+| MOOO-1940-0000-0202A | Creative Name Library   | audio     | J.K. Rowling           | Harry Potter and The Order of the Phoneix | 2003 |   1620 | fiction | NULL   |
+| ZDAB-8521-0000-0001A | Yellow Public Library   | movie     | NULL                   | "The Graduate"                            | 1967 |    108 | drama   | NULL   |
++----------------------+-------------------------+-----------+------------------------+-------------------------------------------+------+--------+---------+--------+
+5 rows in set (0.00 sec)
+
+--------------
+delete from Item
+where not exists (select *
+                  from Checkout
+                  where Checkout.itemID = Item.itemID and
+                        Checkout.libraryName = Item.libraryName
+                 )
+--------------
+
+Query OK, 1 row affected (0.01 sec)
+
+--------------
+select * from Item
+--------------
+
++----------------------+-------------------------+-----------+------------------------+----------------------------------------+------+--------+---------+--------+
+| itemID               | libraryName             | mediaType | author                 | title                                  | year | length | genre   | artist |
++----------------------+-------------------------+-----------+------------------------+----------------------------------------+------+--------+---------+--------+
+| AAAD-1001-0000-1101Z | Green Public Library    | book      | Aleksandr Solzhenitsyn | One Day in the Life of Ivan Denisovich | 1962 |   NULL | fiction | NULL   |
+| APCO-1830-0000-2101A | John Hopkins Library    | book      | Maurice Sendak         | Where the Wild Things Are              | 1963 |   NULL | fantasy | NULL   |
+| FGJA-8410-0000-0010J | National Public Library | movie     | NULL                   | "Live Free or Die Hard"                | 2007 |    129 | action  | NULL   |
+| ZDAB-8521-0000-0001A | Yellow Public Library   | movie     | NULL                   | "The Graduate"                         | 1967 |    108 | drama   | NULL   |
++----------------------+-------------------------+-----------+------------------------+----------------------------------------+------+--------+---------+--------+
+4 rows in set (0.00 sec)
+
+--------------
+select * from Customer
+--------------
+
++----------------------+----------+-----------+------------+
+| customerID           | lastName | firstName | birthDate  |
++----------------------+----------+-----------+------------+
+| 10001100011000110001 | Granger  | Hannah    | 1992-01-03 |
+| 20002200022000220002 | Johnny   | Bravo     | 1984-09-15 |
+| 30003300033000330003 | Joeffery | Baratheon | 2006-06-06 |
+| 40004400044000440004 | John     | Snow      | 2003-08-02 |
+| 50005500055000550005 | Smith    | Mary      | 1972-01-01 |
++----------------------+----------+-----------+------------+
+5 rows in set (0.00 sec)
+
+--------------
+delete from Customer
+where not exists (select *
+                  from Accesses
+                  where Customer.customerID = Accesses.customerID
+                 )
+--------------
+
+Query OK, 1 row affected (0.02 sec)
+
+--------------
+select * from Customer
+--------------
+
++----------------------+----------+-----------+------------+
+| customerID           | lastName | firstName | birthDate  |
++----------------------+----------+-----------+------------+
+| 10001100011000110001 | Granger  | Hannah    | 1992-01-03 |
+| 20002200022000220002 | Johnny   | Bravo     | 1984-09-15 |
+| 30003300033000330003 | Joeffery | Baratheon | 2006-06-06 |
+| 50005500055000550005 | Smith    | Mary      | 1972-01-01 |
++----------------------+----------+-----------+------------+
+4 rows in set (0.01 sec)
+
+--------------
+select * from Accesses
+--------------
+
++----------------------+-------------------------+
+| customerID           | libraryName             |
++----------------------+-------------------------+
+| 10001100011000110001 | Creative Name Library   |
+| 10001100011000110001 | Green Public Library    |
+| 10001100011000110001 | Yellow Public Library   |
+| 20002200022000220002 | Yellow Public Library   |
+| 30003300033000330003 | John Hopkins Library    |
+| 30003300033000330003 | National Public Library |
+| 50005500055000550005 | Creative Name Library   |
++----------------------+-------------------------+
+7 rows in set (0.00 sec)
+
+--------------
+insert into Accesses(customerID, libraryName)
+select customerID, name
+from Customer, Library
+where not exists (select *
+                  from Accesses
+                  where Accesses.customerID = Customer.customerID and
+                        Accesses.libraryName = Library.name
+                 )
+--------------
+
+Query OK, 13 rows affected (0.00 sec)
+Records: 13  Duplicates: 0  Warnings: 0
+
+--------------
+select * from Accesses
+--------------
+
++----------------------+-------------------------+
+| customerID           | libraryName             |
++----------------------+-------------------------+
+| 10001100011000110001 | Creative Name Library   |
+| 10001100011000110001 | Green Public Library    |
+| 10001100011000110001 | John Hopkins Library    |
+| 10001100011000110001 | National Public Library |
+| 10001100011000110001 | Yellow Public Library   |
+| 20002200022000220002 | Creative Name Library   |
+| 20002200022000220002 | Green Public Library    |
+| 20002200022000220002 | John Hopkins Library    |
+| 20002200022000220002 | National Public Library |
+| 20002200022000220002 | Yellow Public Library   |
+| 30003300033000330003 | Creative Name Library   |
+| 30003300033000330003 | Green Public Library    |
+| 30003300033000330003 | John Hopkins Library    |
+| 30003300033000330003 | National Public Library |
+| 30003300033000330003 | Yellow Public Library   |
+| 50005500055000550005 | Creative Name Library   |
+| 50005500055000550005 | Green Public Library    |
+| 50005500055000550005 | John Hopkins Library    |
+| 50005500055000550005 | National Public Library |
+| 50005500055000550005 | Yellow Public Library   |
++----------------------+-------------------------+
+20 rows in set (0.00 sec)
+
+Bye
