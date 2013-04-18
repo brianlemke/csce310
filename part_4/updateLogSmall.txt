@@ -20,7 +20,7 @@ set salary = salary / 2
 where libraryName is null
 --------------
 
-Query OK, 1 row affected (0.01 sec)
+Query OK, 1 row affected (0.02 sec)
 Rows matched: 1  Changed: 1  Warnings: 0
 
 --------------
@@ -52,7 +52,7 @@ select * from Item
 | MOOO-1940-0000-0202A | Creative Name Library   | audio     | J.K. Rowling           | Harry Potter and The Order of the Phoneix | 2003 |   1620 | fiction | NULL   |
 | ZDAB-8521-0000-0001A | Yellow Public Library   | movie     | NULL                   | The Graduate                              | 1967 |    108 | drama   | NULL   |
 +----------------------+-------------------------+-----------+------------------------+-------------------------------------------+------+--------+---------+--------+
-5 rows in set (0.01 sec)
+5 rows in set (0.00 sec)
 
 --------------
 update Item
@@ -103,7 +103,7 @@ where not exists (select *
                  )
 --------------
 
-Query OK, 1 row affected (0.01 sec)
+Query OK, 1 row affected (0.00 sec)
 
 --------------
 select * from Item
@@ -142,7 +142,7 @@ where not exists (select *
                  )
 --------------
 
-Query OK, 1 row affected (0.02 sec)
+Query OK, 1 row affected (0.00 sec)
 
 --------------
 select * from Customer
@@ -156,7 +156,7 @@ select * from Customer
 | 30003300033000330003 | Joeffery | Baratheon | 2006-06-06 |
 | 50005500055000550005 | Smith    | Mary      | 1972-01-01 |
 +----------------------+----------+-----------+------------+
-4 rows in set (0.01 sec)
+4 rows in set (0.00 sec)
 
 --------------
 select * from Accesses
@@ -186,7 +186,7 @@ where not exists (select *
                  )
 --------------
 
-Query OK, 13 rows affected (0.00 sec)
+Query OK, 13 rows affected (0.04 sec)
 Records: 13  Duplicates: 0  Warnings: 0
 
 --------------
@@ -218,5 +218,48 @@ select * from Accesses
 | 50005500055000550005 | Yellow Public Library   |
 +----------------------+-------------------------+
 20 rows in set (0.00 sec)
+
+--------------
+select * from Checkout
+--------------
+
++-------------------------+----------------------+----------------------+------------+------------+------------+
+| libraryName             | customerID           | itemID               | fineAmount | dateOut    | dateDue    |
++-------------------------+----------------------+----------------------+------------+------------+------------+
+| Green Public Library    | 10001100011000110001 | AAAD-1001-0000-1101Z |       2.53 | 2005-08-01 | 2005-08-28 |
+| John Hopkins Library    | 40004400044000440004 | APCO-1830-0000-2101A |          0 | 2011-08-16 | 2011-09-10 |
+| John Hopkins Library    | 30003300033000330003 | APCO-1830-0000-2101A |        0.4 | 2012-06-14 | 2012-07-10 |
+| National Public Library | 30003300033000330003 | FGJA-8410-0000-0010J |       0.53 | 2012-06-09 | 2012-07-05 |
+| Yellow Public Library   | 20002200022000220002 | ZDAB-8521-0000-0001A |          0 | 2013-04-01 | 2013-04-28 |
++-------------------------+----------------------+----------------------+------------+------------+------------+
+5 rows in set (0.00 sec)
+
+--------------
+insert into Checkout(libraryName, customerID, itemID, fineAmount, dateOut, dateDue)
+select libraryName, customerID, itemID, 0.0, curdate(), date_add(curdate(), interval 10 day)
+from Item, Customer
+where mediaType = 'movie' and
+      length >= all (select length from Item where mediaType = 'movie') and
+      birthDate <= all (select birthDate from Customer)
+--------------
+
+Query OK, 1 row affected (0.00 sec)
+Records: 1  Duplicates: 0  Warnings: 0
+
+--------------
+select * from Checkout
+--------------
+
++-------------------------+----------------------+----------------------+------------+------------+------------+
+| libraryName             | customerID           | itemID               | fineAmount | dateOut    | dateDue    |
++-------------------------+----------------------+----------------------+------------+------------+------------+
+| Green Public Library    | 10001100011000110001 | AAAD-1001-0000-1101Z |       2.53 | 2005-08-01 | 2005-08-28 |
+| John Hopkins Library    | 40004400044000440004 | APCO-1830-0000-2101A |          0 | 2011-08-16 | 2011-09-10 |
+| John Hopkins Library    | 30003300033000330003 | APCO-1830-0000-2101A |        0.4 | 2012-06-14 | 2012-07-10 |
+| National Public Library | 30003300033000330003 | FGJA-8410-0000-0010J |       0.53 | 2012-06-09 | 2012-07-05 |
+| National Public Library | 50005500055000550005 | FGJA-8410-0000-0010J |          0 | 2013-04-17 | 2013-04-27 |
+| Yellow Public Library   | 20002200022000220002 | ZDAB-8521-0000-0001A |          0 | 2013-04-01 | 2013-04-28 |
++-------------------------+----------------------+----------------------+------------+------------+------------+
+6 rows in set (0.00 sec)
 
 Bye

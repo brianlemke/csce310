@@ -60,4 +60,14 @@ where not exists (select *
 select * from Accesses;
 
 
+-- INSERT 2
+select * from Checkout;
+-- Have the oldest customers check out the longest movies from the system
+insert into Checkout(libraryName, customerID, itemID, fineAmount, dateOut, dateDue)
+select libraryName, customerID, itemID, 0.0, curdate(), date_add(curdate(), interval 10 day)
+from Item, Customer
+where mediaType = 'movie' and
+      length >= all (select length from Item where mediaType = 'movie') and
+      birthDate <= all (select birthDate from Customer);
 
+select * from Checkout;

@@ -38,7 +38,7 @@ group by Customer.customerID, firstName, lastName
 having sum(fineAmount) > 200.00
 --------------
 
-Empty set (0.01 sec)
+Empty set (0.00 sec)
 
 --------------
 select Library.name, avg(Employee.salary) as averageSalary
@@ -56,7 +56,7 @@ having avg(Employee.salary) >= all (select avg(Employee.salary)
 +----------------------+---------------+
 | Green Public Library |         58000 |
 +----------------------+---------------+
-1 row in set (0.02 sec)
+1 row in set (0.05 sec)
 
 --------------
 select Item.itemID, Item.libraryName, Item.title
@@ -80,7 +80,7 @@ where Item.itemID = Loan.itemID and
 | ZDAB-8521-0000-0001A | Yellow Public Library   | The Graduate                              |
 | MOOO-1940-0000-0202A | Creative Name Library   | Harry Potter and The Order of the Phoneix |
 +----------------------+-------------------------+-------------------------------------------+
-4 rows in set (0.01 sec)
+4 rows in set (0.00 sec)
 
 --------------
 select distinct author
@@ -136,7 +136,7 @@ order by libraryName
 | 30003300033000330003 | Baratheon | Joeffery | National Public Library |         1 |
 | 20002200022000220002 | Bravo     | Johnny   | Yellow Public Library   |         1 |
 +----------------------+-----------+----------+-------------------------+-----------+
-2 rows in set (0.02 sec)
+2 rows in set (0.00 sec)
 
 --------------
 select *
