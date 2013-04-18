@@ -1,0 +1,356 @@
+--------------
+select * from Employee
+--------------
+
++----------------------+-------------+-------------+--------------------------------------+---------+-------------------------------+
+| employeeID           | lastName    | firstName   | title                                | salary  | libraryName                   |
++----------------------+-------------+-------------+--------------------------------------+---------+-------------------------------+
+| 25471183242955511492 | Gislason    | Jasper      | Corporate Brand Developer            | 9340.38 | Hahn and Sons                 |
+| 26092964581707859836 | Beier       | Jarred      | Forward Metrics Agent                | 2742.23 | NULL                          |
+| 26148595418361308993 | Langosh     | Daren       | Principal Configuration Associate    | 1399.17 | Treutel, Kovacek and Legros   |
+| 28739797275453352101 | Wisozk      | Jany        | District Directives Consultant       | 7436.54 | Hahn and Sons                 |
+| 51572107662464662277 | Feeney      | Rogelio     | Principal Integration Liason         | 5999.21 | NULL                          |
+| 63257150674949004213 | Hilll       | Audreanne   | Forward Solutions Director           | 6154.34 | Tremblay-Sanford              |
+| 70566010634967100839 | Gleichner   | Helena      | Future Applications Technician       |  593.23 | Torp, Quigley and Jacobs      |
+| 72416989259779646818 | Brakus      | Marty       | Internal Directives Strategist       |  9216.3 | Lemke-Rippin                  |
+| 73544376569732786833 | Ledner      | Sarah       | Future Intranet Producer             |    2280 | NULL                          |
+| 73875911231569582694 | Swift       | Marie       | Product Accounts Agent               | 1545.15 | Swaniawski, Ledner and Muller |
+| 78192207096282883461 | Bashirian   | Julien      | Senior Security Agent                | 6626.63 | NULL                          |
+| 97715007121246897336 | Funk        | Cordell     | Future Applications Coordinator      | 6185.38 | O'Kon, Hegmann and Mante      |
+...truncated
++----------------------+-------------+-------------+--------------------------------------+---------+-------------------------------+
+100 rows in set (0.00 sec)
+
+--------------
+update Employee
+set salary = salary / 2
+where libraryName is null
+--------------
+
+Query OK, 7 rows affected (0.00 sec)
+Rows matched: 7  Changed: 7  Warnings: 0
+
+--------------
+select * from Employee
+--------------
+
++----------------------+-------------+-------------+--------------------------------------+---------+-------------------------------+
+| employeeID           | lastName    | firstName   | title                                | salary  | libraryName                   |
++----------------------+-------------+-------------+--------------------------------------+---------+-------------------------------+
+| 25471183242955511492 | Gislason    | Jasper      | Corporate Brand Developer            | 9340.38 | Hahn and Sons                 |
+| 26092964581707859836 | Beier       | Jarred      | Forward Metrics Agent                | 1371.11 | NULL                          |
+| 26148595418361308993 | Langosh     | Daren       | Principal Configuration Associate    | 1399.17 | Treutel, Kovacek and Legros   |
+| 28739797275453352101 | Wisozk      | Jany        | District Directives Consultant       | 7436.54 | Hahn and Sons                 |
+| 51572107662464662277 | Feeney      | Rogelio     | Principal Integration Liason         |  2999.6 | NULL                          |
+| 63257150674949004213 | Hilll       | Audreanne   | Forward Solutions Director           | 6154.34 | Tremblay-Sanford              |
+| 70566010634967100839 | Gleichner   | Helena      | Future Applications Technician       |  593.23 | Torp, Quigley and Jacobs      |
+| 72416989259779646818 | Brakus      | Marty       | Internal Directives Strategist       |  9216.3 | Lemke-Rippin                  |
+| 73544376569732786833 | Ledner      | Sarah       | Future Intranet Producer             |    1140 | NULL                          |
+| 73875911231569582694 | Swift       | Marie       | Product Accounts Agent               | 1545.15 | Swaniawski, Ledner and Muller |
+| 78192207096282883461 | Bashirian   | Julien      | Senior Security Agent                | 3313.31 | NULL                          |
+| 97715007121246897336 | Funk        | Cordell     | Future Applications Coordinator      | 6185.38 | O'Kon, Hegmann and Mante      |
+...truncated
++----------------------+-------------+-------------+--------------------------------------+---------+-------------------------------+
+100 rows in set (0.00 sec)
+
+--------------
+select * from Item
+--------------
+
++----------------------+-------------------------------+-----------+--------------------------+------------------------------------------------------------------+------+--------+-------------+------------------------+
+| itemID               | libraryName                   | mediaType | author                   | title                                                            | year | length | genre       | artist                 |
++----------------------+-------------------------------+-----------+--------------------------+------------------------------------------------------------------+------+--------+-------------+------------------------+
+| 00056698238401433909 | Aufderhar-Stracke             | book      | Mrs. Casimer Mayer       | eligendi ut expedita atque iusto dolores                         | 1912 |    628 | romance     | NULL                   |
+| 00094615867312903362 | Treutel, Kovacek and Legros   | audio     | NULL                     | dolores itaque                                                   | 1955 |   1393 | blues       | Douglas Williamson     |
+| 00228464975983865826 | Aufderhar-Stracke             | audio     | NULL                     | et repellat nesciunt autem                                       | 1973 |    924 | electronic  | Alex Goyette           |
+| 00246699320069021147 | Lemke-Rippin                  | audio     | NULL                     | alias exercitationem vero odit                                   | 1947 |   1557 | blues       | Zella Koelpin          |
+| 00310455772408251992 | Hilll-Walter                  | movie     | NULL                     | maiores nisi magnam nesciunt et                                  | 1905 |    120 | sci-fi      | NULL                   |
+| 00381582529442034478 | Treutel, Kovacek and Legros   | movie     | NULL                     | eum voluptatibus dolorem consequuntur porro                      | 1953 |     22 | western     | NULL                   |
+| 00391648701141526457 | Will, Jerde and Roberts       | audio     | NULL                     | repudiandae ut sed ea                                            | 1938 |   1152 | country     | Humberto Cruickshank I |
+| 00419446236893240889 | McCullough-Roberts            | movie     | NULL                     | non eaque corrupti vitae modi                                    | 1940 |     48 | sci-fi      | NULL                   |
+| 00615153135774089198 | Rempel, Luettgen and Dietrich | movie     | NULL                     | nesciunt tenetur ex sequi et                                     | 1905 |     90 | sci-fi      | NULL                   |
+| 00629605365166101191 | Kunze-Stamm                   | movie     | NULL                     | et earum                                                         | 1923 |     89 | drama       | NULL                   |
+| 00682413872953177058 | Smith-Bosco                   | book      | Alexander Muller         | exercitationem dignissimos placeat numquam quia                  | 1942 |   1895 | travel      | NULL                   |
+| 00816125738496881955 | Kunze-Stamm                   | audio     | NULL                     | et mollitia excepturi voluptate                                  | 1952 |   1267 | country     | Jamaal Kulas           |
+| 00854877167766180469 | Kunze-Stamm                   | audio     | NULL                     | unde tempora sit enim dolorem                                    | 1929 |   1985 | pop         | Willis Schiller        |
+| 00908400454489846387 | Smith-Bosco                   | movie     | NULL                     | voluptatum tempore quibusdam temporibus                          | 1933 |    140 | sci-fi      | NULL                   |
+| 01079658056202810360 | Ziemann-Pollich               | movie     | NULL                     | repellat qui vel nam cupiditate                                  | 1954 |    176 | romance     | NULL                   |
+...truncated
++----------------------+-------------------------------+-----------+--------------------------+------------------------------------------------------------------+------+--------+-------------+------------------------+
+1000 rows in set (0.00 sec)
+
+--------------
+update Item
+set title = concat('"', title, '"')
+where mediaType = 'movie' and
+      title not like '"%"'
+--------------
+
+Query OK, 317 rows affected (0.05 sec)
+Rows matched: 317  Changed: 317  Warnings: 0
+
+--------------
+select * from Item
+--------------
+
++----------------------+-------------------------------+-----------+--------------------------+--------------------------------------------------------------------+------+--------+-------------+------------------------+
+| itemID               | libraryName                   | mediaType | author                   | title                                                              | year | length | genre       | artist                 |
++----------------------+-------------------------------+-----------+--------------------------+--------------------------------------------------------------------+------+--------+-------------+------------------------+
+| 00056698238401433909 | Aufderhar-Stracke             | book      | Mrs. Casimer Mayer       | eligendi ut expedita atque iusto dolores                           | 1912 |    628 | romance     | NULL                   |
+| 00094615867312903362 | Treutel, Kovacek and Legros   | audio     | NULL                     | dolores itaque                                                     | 1955 |   1393 | blues       | Douglas Williamson     |
+| 00228464975983865826 | Aufderhar-Stracke             | audio     | NULL                     | et repellat nesciunt autem                                         | 1973 |    924 | electronic  | Alex Goyette           |
+| 00246699320069021147 | Lemke-Rippin                  | audio     | NULL                     | alias exercitationem vero odit                                     | 1947 |   1557 | blues       | Zella Koelpin          |
+| 00310455772408251992 | Hilll-Walter                  | movie     | NULL                     | "maiores nisi magnam nesciunt et"                                  | 1905 |    120 | sci-fi      | NULL                   |
+| 00381582529442034478 | Treutel, Kovacek and Legros   | movie     | NULL                     | "eum voluptatibus dolorem consequuntur porro"                      | 1953 |     22 | western     | NULL                   |
+| 00391648701141526457 | Will, Jerde and Roberts       | audio     | NULL                     | repudiandae ut sed ea                                              | 1938 |   1152 | country     | Humberto Cruickshank I |
+| 00419446236893240889 | McCullough-Roberts            | movie     | NULL                     | "non eaque corrupti vitae modi"                                    | 1940 |     48 | sci-fi      | NULL                   |
+| 00615153135774089198 | Rempel, Luettgen and Dietrich | movie     | NULL                     | "nesciunt tenetur ex sequi et"                                     | 1905 |     90 | sci-fi      | NULL                   |
+| 00629605365166101191 | Kunze-Stamm                   | movie     | NULL                     | "et earum"                                                         | 1923 |     89 | drama       | NULL                   |
+| 00682413872953177058 | Smith-Bosco                   | book      | Alexander Muller         | exercitationem dignissimos placeat numquam quia                    | 1942 |   1895 | travel      | NULL                   |
+| 00816125738496881955 | Kunze-Stamm                   | audio     | NULL                     | et mollitia excepturi voluptate                                    | 1952 |   1267 | country     | Jamaal Kulas           |
+| 00854877167766180469 | Kunze-Stamm                   | audio     | NULL                     | unde tempora sit enim dolorem                                      | 1929 |   1985 | pop         | Willis Schiller        |
+| 00908400454489846387 | Smith-Bosco                   | movie     | NULL                     | "voluptatum tempore quibusdam temporibus"                          | 1933 |    140 | sci-fi      | NULL                   |
+| 01079658056202810360 | Ziemann-Pollich               | movie     | NULL                     | "repellat qui vel nam cupiditate"                                  | 1954 |    176 | romance     | NULL                   |
+...truncated
++----------------------+-------------------------------+-----------+--------------------------+--------------------------------------------------------------------+------+--------+-------------+------------------------+
+1000 rows in set (0.00 sec)
+
+--------------
+select * from Item
+--------------
+
++----------------------+-------------------------------+-----------+--------------------------+--------------------------------------------------------------------+------+--------+-------------+------------------------+
+| itemID               | libraryName                   | mediaType | author                   | title                                                              | year | length | genre       | artist                 |
++----------------------+-------------------------------+-----------+--------------------------+--------------------------------------------------------------------+------+--------+-------------+------------------------+
+| 00056698238401433909 | Aufderhar-Stracke             | book      | Mrs. Casimer Mayer       | eligendi ut expedita atque iusto dolores                           | 1912 |    628 | romance     | NULL                   |
+| 00094615867312903362 | Treutel, Kovacek and Legros   | audio     | NULL                     | dolores itaque                                                     | 1955 |   1393 | blues       | Douglas Williamson     |
+| 00228464975983865826 | Aufderhar-Stracke             | audio     | NULL                     | et repellat nesciunt autem                                         | 1973 |    924 | electronic  | Alex Goyette           |
+| 00246699320069021147 | Lemke-Rippin                  | audio     | NULL                     | alias exercitationem vero odit                                     | 1947 |   1557 | blues       | Zella Koelpin          |
+| 00310455772408251992 | Hilll-Walter                  | movie     | NULL                     | "maiores nisi magnam nesciunt et"                                  | 1905 |    120 | sci-fi      | NULL                   |
+| 00381582529442034478 | Treutel, Kovacek and Legros   | movie     | NULL                     | "eum voluptatibus dolorem consequuntur porro"                      | 1953 |     22 | western     | NULL                   |
+| 00391648701141526457 | Will, Jerde and Roberts       | audio     | NULL                     | repudiandae ut sed ea                                              | 1938 |   1152 | country     | Humberto Cruickshank I |
+| 00419446236893240889 | McCullough-Roberts            | movie     | NULL                     | "non eaque corrupti vitae modi"                                    | 1940 |     48 | sci-fi      | NULL                   |
+| 00615153135774089198 | Rempel, Luettgen and Dietrich | movie     | NULL                     | "nesciunt tenetur ex sequi et"                                     | 1905 |     90 | sci-fi      | NULL                   |
+| 00629605365166101191 | Kunze-Stamm                   | movie     | NULL                     | "et earum"                                                         | 1923 |     89 | drama       | NULL                   |
+| 00682413872953177058 | Smith-Bosco                   | book      | Alexander Muller         | exercitationem dignissimos placeat numquam quia                    | 1942 |   1895 | travel      | NULL                   |
+...truncated
++----------------------+-------------------------------+-----------+--------------------------+--------------------------------------------------------------------+------+--------+-------------+------------------------+
+1000 rows in set (0.00 sec)
+
+--------------
+delete from Item
+where not exists (select *
+                  from Checkout
+                  where Checkout.itemID = Item.itemID and
+                        Checkout.libraryName = Item.libraryName
+                 )
+--------------
+
+Query OK, 137 rows affected (0.04 sec)
+
+--------------
+select * from Item
+--------------
+
++----------------------+-------------------------------+-----------+--------------------------+--------------------------------------------------------------------+------+--------+-------------+------------------------+
+| itemID               | libraryName                   | mediaType | author                   | title                                                              | year | length | genre       | artist                 |
++----------------------+-------------------------------+-----------+--------------------------+--------------------------------------------------------------------+------+--------+-------------+------------------------+
+| 00056698238401433909 | Aufderhar-Stracke             | book      | Mrs. Casimer Mayer       | eligendi ut expedita atque iusto dolores                           | 1912 |    628 | romance     | NULL                   |
+| 00094615867312903362 | Treutel, Kovacek and Legros   | audio     | NULL                     | dolores itaque                                                     | 1955 |   1393 | blues       | Douglas Williamson     |
+| 00310455772408251992 | Hilll-Walter                  | movie     | NULL                     | "maiores nisi magnam nesciunt et"                                  | 1905 |    120 | sci-fi      | NULL                   |
+| 00381582529442034478 | Treutel, Kovacek and Legros   | movie     | NULL                     | "eum voluptatibus dolorem consequuntur porro"                      | 1953 |     22 | western     | NULL                   |
+| 00391648701141526457 | Will, Jerde and Roberts       | audio     | NULL                     | repudiandae ut sed ea                                              | 1938 |   1152 | country     | Humberto Cruickshank I |
+| 00419446236893240889 | McCullough-Roberts            | movie     | NULL                     | "non eaque corrupti vitae modi"                                    | 1940 |     48 | sci-fi      | NULL                   |
+| 00615153135774089198 | Rempel, Luettgen and Dietrich | movie     | NULL                     | "nesciunt tenetur ex sequi et"                                     | 1905 |     90 | sci-fi      | NULL                   |
+| 00629605365166101191 | Kunze-Stamm                   | movie     | NULL                     | "et earum"                                                         | 1923 |     89 | drama       | NULL                   |
+| 00682413872953177058 | Smith-Bosco                   | book      | Alexander Muller         | exercitationem dignissimos placeat numquam quia                    | 1942 |   1895 | travel      | NULL                   |
+...truncated
++----------------------+-------------------------------+-----------+--------------------------+--------------------------------------------------------------------+------+--------+-------------+------------------------+
+863 rows in set (0.00 sec)
+
+--------------
+select * from Customer
+--------------
+
++----------------------+---------------+-------------+------------+
+| customerID           | lastName      | firstName   | birthDate  |
++----------------------+---------------+-------------+------------+
+| 00002863832199414178 | Will          | Terrill     | 1985-05-14 |
+| 00106782603291346152 | Stiedemann    | Lucie       | 1972-09-30 |
+| 00459549512287864188 | Yost          | Shania      | 1977-09-24 |
+| 00507685676729663373 | Kassulke      | Rafaela     | 1973-06-14 |
+| 00598628014951994746 | Reilly        | Sigurd      | 2006-04-02 |
+| 00771680234382554996 | Lindgren      | Lorine      | 2012-11-03 |
+| 00902386344816463742 | Walter        | Sedrick     | 2001-11-13 |
+| 00988930051332234973 | Marvin        | Kris        | 2012-05-06 |
+| 01126728959159890149 | Murray        | Mireya      | 1986-09-17 |
+| 01179033865679586844 | Davis         | Hassan      | 1986-01-10 |
+| 01484055879851224914 | Olson         | Vivienne    | 1979-02-14 |
+| 01664154381790823947 | Schimmel      | Sheldon     | 1976-09-17 |
+...truncated
++----------------------+---------------+-------------+------------+
+500 rows in set (0.00 sec)
+
+--------------
+delete from Customer
+where not exists (select *
+                  from Accesses
+                  where Customer.customerID = Accesses.customerID
+                 )
+--------------
+
+Query OK, 0 rows affected (0.01 sec)
+
+--------------
+select * from Customer
+--------------
+
++----------------------+---------------+-------------+------------+
+| customerID           | lastName      | firstName   | birthDate  |
++----------------------+---------------+-------------+------------+
+| 00002863832199414178 | Will          | Terrill     | 1985-05-14 |
+| 00106782603291346152 | Stiedemann    | Lucie       | 1972-09-30 |
+| 00459549512287864188 | Yost          | Shania      | 1977-09-24 |
+| 00507685676729663373 | Kassulke      | Rafaela     | 1973-06-14 |
+| 00598628014951994746 | Reilly        | Sigurd      | 2006-04-02 |
+| 00771680234382554996 | Lindgren      | Lorine      | 2012-11-03 |
+| 00902386344816463742 | Walter        | Sedrick     | 2001-11-13 |
+| 00988930051332234973 | Marvin        | Kris        | 2012-05-06 |
+| 01126728959159890149 | Murray        | Mireya      | 1986-09-17 |
+| 01179033865679586844 | Davis         | Hassan      | 1986-01-10 |
+| 01484055879851224914 | Olson         | Vivienne    | 1979-02-14 |
+| 01664154381790823947 | Schimmel      | Sheldon     | 1976-09-17 |
+...truncated
++----------------------+---------------+-------------+------------+
+500 rows in set (0.00 sec)
+
+--------------
+select * from Accesses
+--------------
+
++----------------------+-------------------------------+
+| customerID           | libraryName                   |
++----------------------+-------------------------------+
+| 00002863832199414178 | Eichmann-Abbott               |
+| 00002863832199414178 | Kunze-Stamm                   |
+| 00002863832199414178 | Legros-Pouros                 |
+| 00002863832199414178 | O'Kon, Hegmann and Mante      |
+| 00002863832199414178 | Rau-Klein                     |
+| 00002863832199414178 | Runolfsson-Littel             |
+| 00002863832199414178 | Tremblay-Sanford              |
+| 00002863832199414178 | Will, Jerde and Roberts       |
+| 00002863832199414178 | Zemlak Group                  |
+| 00106782603291346152 | Baumbach, Roob and Hagenes    |
+| 00106782603291346152 | Eichmann-Abbott               |
+| 00106782603291346152 | Maggio, Kautzer and Leannon   |
+...truncated
++----------------------+-------------------------------+
+5000 rows in set (0.00 sec)
+
+--------------
+insert into Accesses(customerID, libraryName)
+select customerID, name
+from Customer, Library
+where not exists (select *
+                  from Accesses
+                  where Accesses.customerID = Customer.customerID and
+                        Accesses.libraryName = Library.name
+                 )
+--------------
+
+Query OK, 10000 rows affected (0.90 sec)
+Records: 10000  Duplicates: 0  Warnings: 0
+
+--------------
+select * from Accesses
+--------------
+
++----------------------+-------------------------------+
+| customerID           | libraryName                   |
++----------------------+-------------------------------+
+| 00002863832199414178 | Auer-Feil                     |
+| 00002863832199414178 | Aufderhar-Stracke             |
+| 00002863832199414178 | Bailey, Upton and Konopelski  |
+| 00002863832199414178 | Baumbach, Roob and Hagenes    |
+| 00002863832199414178 | Durgan Inc                    |
+| 00002863832199414178 | Eichmann-Abbott               |
+| 00002863832199414178 | Hahn and Sons                 |
+| 00002863832199414178 | Hilll-Walter                  |
+| 00002863832199414178 | Kunze-Stamm                   |
+| 00002863832199414178 | Legros-Pouros                 |
+| 00002863832199414178 | Lemke-Rippin                  |
+| 00002863832199414178 | Maggio, Kautzer and Leannon   |
+| 00002863832199414178 | McCullough-Roberts            |
+| 00002863832199414178 | Muller Inc                    |
+| 00002863832199414178 | Murphy-Kuhic                  |
+| 00002863832199414178 | O'Connell-Cremin              |
+| 00002863832199414178 | O'Kon, Hegmann and Mante      |
+| 00002863832199414178 | Rau-Klein                     |
+| 00002863832199414178 | Rempel, Luettgen and Dietrich |
+| 00002863832199414178 | Reynolds and Sons             |
+| 00002863832199414178 | Runolfsson-Littel             |
+| 00002863832199414178 | Smith-Bosco                   |
+| 00002863832199414178 | Swaniawski, Ledner and Muller |
+| 00002863832199414178 | Swift, Casper and Gottlieb    |
+| 00002863832199414178 | Torp, Quigley and Jacobs      |
+| 00002863832199414178 | Tremblay-Sanford              |
+| 00002863832199414178 | Treutel, Kovacek and Legros   |
+| 00002863832199414178 | Will, Jerde and Roberts       |
+| 00002863832199414178 | Zemlak Group                  |
+| 00002863832199414178 | Ziemann-Pollich               |
+| 00106782603291346152 | Auer-Feil                     |
+| 00106782603291346152 | Aufderhar-Stracke             |
+| 00106782603291346152 | Bailey, Upton and Konopelski  |
+| 00106782603291346152 | Baumbach, Roob and Hagenes    |
+| 00106782603291346152 | Durgan Inc                    |
+| 00106782603291346152 | Eichmann-Abbott               |
+...truncated
++----------------------+-------------------------------+
+15000 rows in set (0.04 sec)
+
+--------------
+select * from Checkout
+--------------
+
++-------------------------------+----------------------+----------------------+------------+------------+------------+
+| libraryName                   | customerID           | itemID               | fineAmount | dateOut    | dateDue    |
++-------------------------------+----------------------+----------------------+------------+------------+------------+
+| Auer-Feil                     | 52999455838778634074 | 03073248027996276507 |       26.9 | 1970-02-18 | 1970-03-02 |
+| Auer-Feil                     | 77763460581109284091 | 03073248027996276507 |       1.03 | 1975-10-15 | 1975-10-20 |
+| Auer-Feil                     | 80553791575413732818 | 03073248027996276507 |       18.1 | 1992-04-08 | 1992-04-10 |
+| Auer-Feil                     | 34392250869703726555 | 03073248027996276507 |       5.26 | 2007-12-16 | 2007-12-25 |
+| Auer-Feil                     | 89168704245922220845 | 11977508738097557153 |      68.23 | 1985-09-04 | 1985-09-15 |
+| Auer-Feil                     | 02092073591334280968 | 11977508738097557153 |      34.89 | 1990-08-18 | 1990-09-08 |
+...truncated
++-------------------------------+----------------------+----------------------+------------+------------+------------+
+2000 rows in set (0.00 sec)
+
+--------------
+insert into Checkout(libraryName, customerID, itemID, fineAmount, dateOut, dateDue)
+select libraryName, customerID, itemID, 0.0, curdate(), date_add(curdate(), interval 10 day)
+from Item, Customer
+where mediaType = 'movie' and
+      length >= all (select length from Item where mediaType = 'movie') and
+      birthDate <= all (select birthDate from Customer)
+--------------
+
+Query OK, 1 row affected (0.00 sec)
+Records: 1  Duplicates: 0  Warnings: 0
+
+--------------
+select * from Checkout
+--------------
+
++-------------------------------+----------------------+----------------------+------------+------------+------------+
+| libraryName                   | customerID           | itemID               | fineAmount | dateOut    | dateDue    |
++-------------------------------+----------------------+----------------------+------------+------------+------------+
+| Auer-Feil                     | 52999455838778634074 | 03073248027996276507 |       26.9 | 1970-02-18 | 1970-03-02 |
+| Auer-Feil                     | 77763460581109284091 | 03073248027996276507 |       1.03 | 1975-10-15 | 1975-10-20 |
+| Auer-Feil                     | 80553791575413732818 | 03073248027996276507 |       18.1 | 1992-04-08 | 1992-04-10 |
+| Auer-Feil                     | 34392250869703726555 | 03073248027996276507 |       5.26 | 2007-12-16 | 2007-12-25 |
+| Auer-Feil                     | 89168704245922220845 | 11977508738097557153 |      68.23 | 1985-09-04 | 1985-09-15 |
+| Auer-Feil                     | 02092073591334280968 | 11977508738097557153 |      34.89 | 1990-08-18 | 1990-09-08 |
+| Auer-Feil                     | 50982125207794851144 | 51054816774320011104 |          0 | 2013-04-17 | 2013-04-27 |
+...truncated
++-------------------------------+----------------------+----------------------+------------+------------+------------+
+2001 rows in set (0.01 sec)

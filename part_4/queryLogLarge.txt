@@ -1,0 +1,309 @@
+--------------
+select name as libraryName, count(itemID) as numBooks
+from Library, Item
+where Library.name = Item.libraryName and Item.mediaType = 'book'
+group by Library.name
+--------------
+
++-------------------------------+----------+
+| libraryName                   | numBooks |
++-------------------------------+----------+
+| Auer-Feil                     |        8 |
+| Aufderhar-Stracke             |       13 |
+| Bailey, Upton and Konopelski  |        9 |
+| Baumbach, Roob and Hagenes    |       15 |
+| Durgan Inc                    |       12 |
+| Eichmann-Abbott               |        5 |
+| Hahn and Sons                 |        8 |
+| Hilll-Walter                  |       15 |
+| Kunze-Stamm                   |       11 |
+| Legros-Pouros                 |        9 |
+| Lemke-Rippin                  |       15 |
+| Maggio, Kautzer and Leannon   |       10 |
+| McCullough-Roberts            |        8 |
+| Muller Inc                    |        9 |
+| Murphy-Kuhic                  |       10 |
+| O'Connell-Cremin              |        5 |
+| O'Kon, Hegmann and Mante      |       11 |
+| Rau-Klein                     |       10 |
+| Rempel, Luettgen and Dietrich |       14 |
+| Reynolds and Sons             |       10 |
+| Runolfsson-Littel             |       17 |
+| Smith-Bosco                   |       10 |
+| Swaniawski, Ledner and Muller |       13 |
+| Swift, Casper and Gottlieb    |       15 |
+| Torp, Quigley and Jacobs      |        9 |
+| Tremblay-Sanford              |        6 |
+| Treutel, Kovacek and Legros   |       14 |
+| Will, Jerde and Roberts       |       10 |
+| Zemlak Group                  |       19 |
+| Ziemann-Pollich               |        9 |
++-------------------------------+----------+
+30 rows in set (0.00 sec)
+
+--------------
+select *
+from Item
+where not exists(select *
+                 from Checkout
+                 where Checkout.itemID = Item.itemID and
+                       Checkout.libraryName = Item.libraryName
+                )
+--------------
+
++----------------------+-------------------------------+-----------+-----------------------+---------------------------------------------------------+------+--------+-------------+------------------------+
+| itemID               | libraryName                   | mediaType | author                | title                                                   | year | length | genre       | artist                 |
++----------------------+-------------------------------+-----------+-----------------------+---------------------------------------------------------+------+--------+-------------+------------------------+
+| 00228464975983865826 | Aufderhar-Stracke             | audio     | NULL                  | et repellat nesciunt autem                              | 1973 |    924 | electronic  | Alex Goyette           |
+| 00246699320069021147 | Lemke-Rippin                  | audio     | NULL                  | alias exercitationem vero odit                          | 1947 |   1557 | blues       | Zella Koelpin          |
+| 00816125738496881955 | Kunze-Stamm                   | audio     | NULL                  | et mollitia excepturi voluptate                         | 1952 |   1267 | country     | Jamaal Kulas           |
+| 03940151687208731228 | Kunze-Stamm                   | movie     | NULL                  | neque animi corrupti                                    | 1969 |     55 | comedy      | NULL                   |
+| 03960855073501085931 | Tremblay-Sanford              | movie     | NULL                  | reiciendis nihil maxime sit et harum                    | 1987 |    179 | educational | NULL                   |
+| 04048091647475381157 | Treutel, Kovacek and Legros   | movie     | NULL                  | itaque consequatur                                      | 0000 |    172 | drama       | NULL                   |
+| 04124568681326470040 | Aufderhar-Stracke             | book      | Dr. Marcel Schimmel   | voluptas dolor id aut                                   | 1985 |   1315 | young adult | NULL                   |
+| 04740057000300599858 | Baumbach, Roob and Hagenes    | movie     | NULL                  | aut enim id occaecati                                   | 1989 |     58 | drama       | NULL                   |
+| 07384493904586468797 | Smith-Bosco                   | movie     | NULL                  | non sit et                                              | 1943 |     77 | comedy      | NULL                   |
+| 08586773269506488051 | Rempel, Luettgen and Dietrich | movie     | NULL                  | qui in autem et perferendis                             | 1986 |     91 | sci-fi      | NULL                   |
+| 08598896902789465162 | Murphy-Kuhic                  | book      | Sydni Gorczany III    | deserunt molestias                                      | 1919 |   1679 | non-fiction | NULL                   |
+| 09527692561665333446 | Treutel, Kovacek and Legros   | book      | Dixie Hudson          | vero in quidem minus                                    | 2011 |   1759 | sci-fi      | NULL                   |
+| 09838570025293012192 | Kunze-Stamm                   | book      | Miss Eloisa Durgan    | dolores repellat eaque                                  | 1905 |    614 | romance     | NULL                   |
+| 11238928505144185442 | Runolfsson-Littel             | book      | Koby Wiza             | possimus qui porro quae sit id                          | 1991 |   1627 | adventure   | NULL                   |
+...truncated
++----------------------+-------------------------------+-----------+-----------------------+---------------------------------------------------------+------+--------+-------------+------------------------+
+137 rows in set (0.02 sec)
+
+--------------
+select Customer.customerID, firstName, lastName, sum(fineAmount) as totalFines
+from Customer, Checkout
+where Customer.customerID = Checkout.customerID
+group by Customer.customerID, firstName, lastName
+having sum(fineAmount) > 200.00
+--------------
+
++----------------------+-------------+---------------+--------------------+
+| customerID           | firstName   | lastName      | totalFines         |
++----------------------+-------------+---------------+--------------------+
+| 00002863832199414178 | Terrill     | Will          |  294.1800003051758 |
+| 00106782603291346152 | Lucie       | Stiedemann    | 221.61000442504883 |
+| 00459549512287864188 | Shania      | Yost          | 445.58000525832176 |
+| 00507685676729663373 | Rafaela     | Kassulke      |  280.1299934387207 |
+| 00598628014951994746 | Sigurd      | Reilly        |  336.0399971008301 |
+| 00771680234382554996 | Lorine      | Lindgren      | 260.51000213623047 |
+| 00902386344816463742 | Sedrick     | Walter        | 351.27000427246094 |
+| 01126728959159890149 | Mireya      | Murray        | 221.76000022888184 |
+| 01179033865679586844 | Hassan      | Davis         | 231.22999501228333 |
+| 01484055879851224914 | Vivienne    | Olson         |  426.6600065231323 |
+| 01664154381790823947 | Sheldon     | Schimmel      |  202.3000030517578 |
+| 02080752816446412530 | Josue       | Sauer         |  293.5999927520752 |
+| 02092073591334280968 | Rickey      | Stokes        | 437.29999923706055 |
+| 03094919354373020126 | Rashad      | Boyer         |   299.060001373291 |
+| 99991038376816861778 | Douglas     | Kerluke       |   343.460000038147 |
+...truncated
++----------------------+-------------+---------------+--------------------+
+221 rows in set (0.02 sec)
+
+--------------
+select Library.name, avg(Employee.salary) as averageSalary
+from Library, Employee
+where Library.name = Employee.libraryName
+group by Library.name
+having avg(Employee.salary) >= all (select avg(Employee.salary)
+                                    from Library, Employee
+                                    where Library.name = Employee.libraryName
+                                    group by Library.name)
+--------------
+
++---------------+-----------------+
+| name          | averageSalary   |
++---------------+-----------------+
+| Hahn and Sons | 8388.4599609375 |
++---------------+-----------------+
+1 row in set (0.00 sec)
+
+--------------
+select Item.itemID, Item.libraryName, Item.title
+from Item, Checkout
+where Item.itemID = Checkout.itemID and
+      Item.libraryName = Checkout.libraryName and
+      Checkout.dateOut >= date_sub(curdate(), interval 1 year)
+union
+select Item.itemID, Item.libraryName, Item.title
+from Item, Loan
+where Item.itemID = Loan.itemID and
+      Item.libraryName = Loan.lendingLibrary and
+      Loan.dateOut >= date_sub(curdate(), interval 1 year)
+--------------
+
++----------------------+-------------------------------+------------------------------------------------------------------+
+| itemID               | libraryName                   | title                                                            |
++----------------------+-------------------------------+------------------------------------------------------------------+
+| 02650708801281567514 | Swift, Casper and Gottlieb    | et quaerat dolor est dolor est                                   |
+| 03049374728074681738 | Kunze-Stamm                   | perspiciatis rem ratione vel                                     |
+| 04094471654771740370 | Runolfsson-Littel             | ipsum nihil aut                                                  |
+| 06008507080177519486 | Torp, Quigley and Jacobs      | ad eligendi ducimus dicta molestiae iusto                        |
+| 07207830849429633404 | Durgan Inc                    | quam consequatur qui qui dolore et                               |
+| 07409748711041629502 | Smith-Bosco                   | debitis atque doloremque at inventore                            |
+| 07912264964597774402 | Reynolds and Sons             | hic sint accusamus                                               |
+| 12370429657276105948 | Torp, Quigley and Jacobs      | illum libero et                                                  |
+| 15709607537128143531 | Legros-Pouros                 | repellendus quia ut rerum accusamus et                           |
+| 17280139485785796427 | O'Kon, Hegmann and Mante      | hic laborum                                                      |
+| 17723193286710217396 | O'Kon, Hegmann and Mante      | enim exercitationem consequuntur voluptatum praesentium repellat |
+| 18260601452357819346 | Baumbach, Roob and Hagenes    | commodi aut delectus ipsam                                       |
+...truncated
++----------------------+-------------------------------+------------------------------------------------------------------+
+60 rows in set (0.01 sec)
+
+--------------
+select distinct author
+from Item
+where mediaType = 'book'
+order by author
+--------------
+
++--------------------------+
+| author                   |
++--------------------------+
+| Abagail Jenkins          |
+| Abigale Koch             |
+| Adell Hilpert II         |
+| Adolf Brakus             |
+| Aiden Stanton            |
+| Alanna Yost              |
+| Alberta Ebert Jr.        |
+| Alessandra Donnelly      |
+| Alexander Muller         |
+| Alfred Gleichner         |
+| Alisha Jacobs            |
+| Allene Hudson            |
+| Amalia Schoen            |
+| Amparo Roberts IV        |
+| Anabelle Tremblay        |
+| Anahi Steuber            |
+| Angel Shanahan           |
+| Anibal Medhurst          |
+| Aniya MacGyver           |
+...truncated
++--------------------------+
+329 rows in set (0.00 sec)
+
+--------------
+select Item.itemID, Item.libraryName, Item.title, count(Checkout.dateOut) as timesCheckedOut
+from Item left join Checkout on
+     Item.itemID = Checkout.itemID and Item.libraryName = Checkout.libraryName
+group by Item.itemID, Item.libraryName, Item.title
+order by count(Checkout.dateOut) desc
+--------------
+
++----------------------+-------------------------------+------------------------------------------------------------------+-----------------+
+| itemID               | libraryName                   | title                                                            | timesCheckedOut |
++----------------------+-------------------------------+------------------------------------------------------------------+-----------------+
+| 40552283566517784837 | Torp, Quigley and Jacobs      | ducimus quibusdam id et                                          |               8 |
+| 38318365510711297181 | Legros-Pouros                 | velit quae explicabo sit                                         |               8 |
+| 77023147695297001149 | Durgan Inc                    | sed facere est saepe                                             |               6 |
+| 95049247207466371989 | Eichmann-Abbott               | placeat minus consequatur velit maiores cum                      |               6 |
+| 35083248172912299991 | Torp, Quigley and Jacobs      | esse est incidunt perspiciatis                                   |               6 |
+| 38568183823134808715 | Hahn and Sons                 | tempore id eum iure quis nulla                                   |               6 |
+| 83762214585989946611 | O'Connell-Cremin              | totam rem                                                        |               6 |
+| 01202347238794907181 | Kunze-Stamm                   | sit beatae doloremque facilis dicta                              |               6 |
+| 98045998716331546745 | Hahn and Sons                 | cum et sit nesciunt                                              |               6 |
+| 02650708801281567514 | Swift, Casper and Gottlieb    | et quaerat dolor est dolor est                                   |               6 |
+| 60976072959049926678 | O'Connell-Cremin              | ut aliquam                                                       |               6 |
+| 98513457933073906653 | O'Connell-Cremin              | aut fugit velit iste perspiciatis deserunt                       |               6 |
+| 83542691128545644518 | Bailey, Upton and Konopelski  | quis corrupti illum est                                          |               6 |
+| 52461765735906356713 | Torp, Quigley and Jacobs      | aperiam recusandae velit non qui                                 |               6 |
+| 52068103596210170702 | Kunze-Stamm                   | tempora laboriosam est                                           |               6 |
+| 30926975255267043894 | Runolfsson-Littel             | ullam veritatis facere consequatur                               |               5 |
+| 93982072869020055219 | Reynolds and Sons             | dolor omnis dolores quia                                         |               5 |
+| 54568567685425961535 | Auer-Feil                     | ut iusto rerum                                                   |               5 |
+...truncated
++----------------------+-------------------------------+------------------------------------------------------------------+-----------------+
+1000 rows in set (0.02 sec)
+
+--------------
+select customerID, firstName, lastName, libraryName, count(itemID) as numMovies
+from Customer natural join Checkout c1 natural join Item
+where mediaType = 'movie'
+group by customerID, firstName, lastName, libraryName
+having count(itemID) >= all (select count(itemID)
+                             from Checkout natural join Item
+                             where libraryName = c1.libraryName and
+                                   mediaType = 'movie'
+                             group by customerID
+                            )
+order by libraryName
+--------------
+
++----------------------+------------+-------------+-------------------------------+-----------+
+| customerID           | firstName  | lastName    | libraryName                   | numMovies |
++----------------------+------------+-------------+-------------------------------+-----------+
+| 51960776861777170569 | Myrl       | Graham      | Auer-Feil                     |         2 |
+| 21994460063573839952 | Stacey     | Goodwin     | Auer-Feil                     |         2 |
+| 42014101518137328811 | Elenora    | Cormier     | Auer-Feil                     |         2 |
+| 90022919442518395022 | Stone      | Boyer       | Aufderhar-Stracke             |         2 |
+| 93707942093117661612 | Harley     | Kuphal      | Bailey, Upton and Konopelski  |         2 |
+| 07838017394380046133 | Leila      | Gibson      | Bailey, Upton and Konopelski  |         2 |
+| 06448864333731315869 | Norbert    | Jast        | Bailey, Upton and Konopelski  |         2 |
+| 85188702299769374346 | Amina      | Sipes       | Baumbach, Roob and Hagenes    |         1 |
+| 26578955245147070531 | Melyna     | O'Connell   | Baumbach, Roob and Hagenes    |         1 |
+| 64362586779808447818 | Nadia      | Swaniawski  | Baumbach, Roob and Hagenes    |         1 |
+| 90022919442518395022 | Stone      | Boyer       | Baumbach, Roob and Hagenes    |         1 |
+| 21297471612807700751 | Monserrat  | Schaefer    | Baumbach, Roob and Hagenes    |         1 |
+| 44852672979660545292 | Franz      | McCullough  | Baumbach, Roob and Hagenes    |         1 |
+| 95613333157545216224 | Josh       | Ward        | Baumbach, Roob and Hagenes    |         1 |
+| 96859813453107083854 | Joanny     | Jones       | Baumbach, Roob and Hagenes    |         1 |
+| 40830003892086822342 | Kavon      | Barrows     | Baumbach, Roob and Hagenes    |         1 |
+| 39770957664438458657 | Breanne    | Carter      | Durgan Inc                    |         2 |
+...truncated
++----------------------+------------+-------------+-------------------------------+-----------+
+123 rows in set (0.12 sec)
+
+--------------
+select *
+from Employee
+where libraryName in (select Library.name
+                      from Library, Checkout
+                      where Library.name = Checkout.libraryName
+                      group by Library.name
+                      having count(itemID) >= all (select count(itemID)
+                                                   from Library, Checkout
+                                                   where Library.name = Checkout.libraryName
+                                                   group by Library.name
+                                                  )
+                     )
+--------------
+
++----------------------+------------+-----------+---------------------------------+---------+-------------------+
+| employeeID           | lastName   | firstName | title                           | salary  | libraryName       |
++----------------------+------------+-----------+---------------------------------+---------+-------------------+
+| 01151967785067080956 | Altenwerth | Benjamin  | Dynamic Functionality Associate | 4008.36 | Runolfsson-Littel |
+| 24241482283004956663 | DuBuque    | Theodore  | Senior Branding Architect       | 7304.81 | Runolfsson-Littel |
+| 60940815356495933220 | Cole       | Blaze     | Customer Brand Associate        | 6549.91 | Runolfsson-Littel |
+| 61896823569994961483 | Wiegand    | Norma     | Legacy Data Officer             | 7034.44 | Runolfsson-Littel |
+| 89778910727164760735 | Jacobs     | Mara      | Dynamic Implementation Director | 2001.24 | Runolfsson-Littel |
++----------------------+------------+-----------+---------------------------------+---------+-------------------+
+5 rows in set (0.13 sec)
+
+--------------
+select Item.itemID, title, mediaType
+from Item join
+     Checkout on Item.itemID = Checkout.itemID join
+     Loan on Checkout.itemID = Loan.itemID
+--------------
+
++----------------------+----------------------------------------------------------------+-----------+
+| itemID               | title                                                          | mediaType |
++----------------------+----------------------------------------------------------------+-----------+
+| 45559332511198016506 | ut molestiae assumenda repellat                                | movie     |
+| 45559332511198016506 | ut molestiae assumenda repellat                                | movie     |
+| 45559332511198016506 | ut molestiae assumenda repellat                                | movie     |
+| 45559332511198016506 | ut molestiae assumenda repellat                                | movie     |
+| 45559332511198016506 | ut molestiae assumenda repellat                                | movie     |
+| 54568567685425961535 | ut iusto rerum                                                 | movie     |
+| 54568567685425961535 | ut iusto rerum                                                 | movie     |
+| 54568567685425961535 | ut iusto rerum                                                 | movie     |
+| 54568567685425961535 | ut iusto rerum                                                 | movie     |
+| 54568567685425961535 | ut iusto rerum                                                 | movie     |
+| 20560431355431722132 | aut optio atque repudiandae                                    | book      |
+...truncated
++----------------------+----------------------------------------------------------------+-----------+
+425 rows in set (0.12 sec)
