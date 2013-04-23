@@ -1,4 +1,5 @@
 import java.sql.*;
+import java.util.ArrayList;
 
 public class DatabaseAccess
 {
@@ -10,6 +11,8 @@ public class DatabaseAccess
   public static final String databaseHost     = "localhost";
 
   private PreparedStatement getCustomer;
+  private PreparedStatement getLibraries;
+  // TODO: add all new SQL statements here
 
   public DatabaseAccess()
   {
@@ -45,12 +48,14 @@ public class DatabaseAccess
   public boolean prepareStatements()
   {
     String getCustomerString = "select * from Customer where customerID = ?";
+    String getLibrariesString = "select * from Library order by name";
+    // TODO: create any new SQL query strings here
 
     try
     {
-      getCustomer = conn.prepareStatement(getCustomerString,
-                                          ResultSet.TYPE_SCROLL_INSENSITIVE,
-                                          ResultSet.CONCUR_READ_ONLY);
+      getCustomer = conn.prepareStatement(getCustomerString);
+      getLibraries = conn.prepareStatement(getLibrariesString);
+      // TODO: prepare any new statements here
       return true;
     }
     catch(SQLException e)
@@ -105,4 +110,39 @@ public class DatabaseAccess
       return null;
     }
   }
+
+  public ArrayList<Library> getLibraries()
+  {
+    ArrayList<Library> libraries = new ArrayList<Library>();
+
+    try
+    {
+      ResultSet rs = getLibraries.executeQuery();
+
+      while (rs.next())
+      {
+        Library l = new Library();
+        l.name = rs.getString("name");
+        l.address = rs.getString("address");
+        l.city = rs.getString("city");
+        l.zip = rs.getString("zip");
+        libraries.add(l);
+      }
+
+      rs.close();
+    }
+    catch(SQLException e)
+    {
+      System.err.println("Error in getLibraries: " + e);
+    }
+    finally
+    {
+      return libraries;
+    }
+  }
+
+  // TODO: add any new database query/update helper methods here. Each method
+  // should use PreparedStatements declared above. The methods should accept 
+  // parameters and return values that use the custom data types, rather than
+  // ResultSets.
 }

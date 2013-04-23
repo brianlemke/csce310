@@ -6,3 +6,5 @@ build:
 		Checkout.java Customer.java Employee.java Item.java Library.java \
 		Loan.java Movie.java
 
+clean:
+	rm *.class
