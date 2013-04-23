@@ -3,3 +3,6 @@ part_1/Thumbs.db
 # Ignore scripts that are machine-specific
 *.sh
 reset_db.sql
+
+# Ignore compiled java files
+*.class
