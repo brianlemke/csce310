@@ -10,8 +10,12 @@ public class DatabaseAccess
   public static final String databaseName     = "csce310";
   public static final String databaseHost     = "localhost";
 
+
   private PreparedStatement getCustomer;
   private PreparedStatement getLibraries;
+  private PreparedStatement getLoan;
+  private PreparedStatement addCustomer;
+  private PreparedStatement addItem;
   // TODO: add all new SQL statements here
 
   public DatabaseAccess()
@@ -49,12 +53,18 @@ public class DatabaseAccess
   {
     String getCustomerString = "select * from Customer where customerID = ?";
     String getLibrariesString = "select * from Library order by name";
-    // TODO: create any new SQL query strings here
+	String getLoanString = "select * from Loan where itemID = ?";
+	String addCustomerString = "insert into Customer values"; // might need to edit a little
+    String addItemString = "insert into Item values";
+	// TODO: create any new SQL query strings here
 
     try
     {
       getCustomer = conn.prepareStatement(getCustomerString);
       getLibraries = conn.prepareStatement(getLibrariesString);
+	  getLoan = conn.prepareStatement(getLoanString);
+	  addCustomer = conn.prepareStatement(addCustomerString);
+	  addItem = conn.prepareStatement(addItemString);
       // TODO: prepare any new statements here
       return true;
     }
@@ -79,6 +89,7 @@ public class DatabaseAccess
     }
   }
 
+ 
   public Customer getCustomer(String customerID)
   {
     try
@@ -140,6 +151,117 @@ public class DatabaseAccess
       return libraries;
     }
   }
+  
+   public Loan getLoan(String itemID) 
+  {
+    try
+	{
+	  getLoan.setString(1,itemID);
+	  ResultSet rs = getLoan.executeQuery();
+	  if (rs.next())
+	  {
+	    Loan loan = new Loan();
+		loan.lendingLibrary = rs.getString("lendingLibrary");
+		loan.borrowingLibrary = rs.getString("borrowingLibrary");
+		loan.dateOut = rs.getDate("dateOut");
+		loan.itemID = rs.getString("itemID");
+		
+		rs.close();
+		return loan;
+	  }
+	  else
+	  {
+	  
+	    rs.close();
+		return null;
+	  }
+	}
+	catch(SQLException e)
+	{
+	System.err.println("Error in getLoan: " + e);
+	return null;
+	}
+  }
+  
+  public void addCustomer(Customer c) 
+  {
+    try {
+	  Statement s = conn.createStatement();
+	  if (c.customerID != null) {
+	    s.executeUpdate(addCustomer + "('" + c.customerID + "','"
+	                    + c.lastName + "','" + c.firstName + "','"
+					    + c.birthDate + "');");
+		s.close();
+	  }
+	  else //primary key doesnt exist
+		s.close();
+	}
+	catch(SQLException e)
+	{
+	  System.err.println("Error in addCustomer: " + e);
+	}    
+  }
+  public void addMovie(Movie m)
+  {
+    try {
+      Statement s = conn.createStatement();
+	  if (m.itemID != null && m.libraryName != null) {
+        s.executeUpdate(addItem + "('" + m.itemID + "','" + m.libraryName
+					     + "','" + m.mediaType + "','" + m.title 
+						 + "','" + m.year + "','" + m.length 
+						 + "','" + m.genre + "');");      	
+	    s.close();
+	  }
+	  else //primary key doesnt exist
+	    s.close();
+    }
+	catch(SQLException e)
+	{
+	  System.err.println("Error in addMovie: " + e);
+	}     
+  }
+  
+  public void addBook(Book b)
+  {
+    try {
+      Statement s = conn.createStatement();
+	  if (b.itemID != null && b.libraryName != null) {
+        s.executeUpdate(addItem + "('" + b.itemID + "','" + b.libraryName
+					     + "','" + b.mediaType + "','" + b.author 
+						 + "','" + b.title + "','" + b.year + "','" + b.length 
+						 + "','" + b.genre + "');");      	
+	    s.close();
+	  }
+	  else //primary key doesnt exist
+	    s.close();
+    }
+	catch(SQLException e)
+	{
+	  System.err.println("Error in addBook: " + e);
+	}     
+  }
+  
+  public void addAudio(Audio a)
+  {
+    try {
+      Statement s = conn.createStatement();
+	  if (a.itemID != null && a.libraryName != null) {
+        s.executeUpdate(addItem + "('" + a.itemID + "','" + a.libraryName
+					     + "','" + a.mediaType + "','" + a.title 
+						 + "','" + a.year + "','" + a.length 
+						 + "','" + a.genre + "','" + a.artist + "');");      	
+	    s.close();
+	  }
+	  else //primary key doesnt exist
+	    s.close();
+    }
+	catch(SQLException e)
+	{
+	  System.err.println("Error in addAudio: " + e);
+	}     
+  }
+ 
+  
 
   // TODO: add any new database query/update helper methods here. Each method
   // should use PreparedStatements declared above. The methods should accept 
