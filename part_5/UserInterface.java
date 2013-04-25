@@ -1,5 +1,7 @@
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
+import java.io.Console;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 import java.util.Date;
@@ -9,6 +11,7 @@ public class UserInterface
   private DatabaseAccess db;
   private Scanner sc;
   private Library currentLibrary;
+  Console c = System.console();
 
   public UserInterface(DatabaseAccess db)
   {
@@ -96,6 +99,47 @@ public class UserInterface
 
   private void searchCustomers()
   {
+	  
+	  assert(currentLibrary != null);
+
+    String header = "Searching " + currentLibrary.name + "for customer";
+    ArrayList<String> choices = new ArrayList<String>();
+    choices.add("Find By First Name");
+    choices.add("Find By Late Fees");
+    choices.add("Exit");
+    String prompt = "Enter the number of your choice: ";
+
+    System.out.println(header);
+    for (int i = 0; i < choices.size(); i++)
+    {
+      System.out.printf("%2d - %s\n", i + 1, choices.get(i));
+    }
+
+    int selection = readSelection(prompt, choices.size());
+    
+    switch(selection)
+    {
+    case 1:
+    	String name = c.readLine("Enter the First Name: ");
+    	for(Customer customer : db.findUserByName(name, currentLibrary.name)){
+    		System.out.println("Customer: ");
+    		System.out.println("\t First Name: "+customer.firstName);
+    		System.out.println("\t Last Name: "+customer.lastName);
+    		System.out.println("\t Birthday: "+customer.birthDate);
+    		System.out.println("\t ID: "+customer.customerID);
+    	}
+    	break;
+    case 2:
+    	String feestring = c.readLine("Enter minimum Late Fee: ");
+    	float fee = Float.parseFloat(feestring);
+    	for(String customer : db.findCustomerByLateFee(fee, currentLibrary.name)){
+    		System.out.println(customer);
+    	}
+    	break;
+    default:
+    	break;
+    }
+    
   }
 
   private void searchLoans()

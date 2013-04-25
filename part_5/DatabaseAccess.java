@@ -1,5 +1,7 @@
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class DatabaseAccess
 {
@@ -16,6 +18,8 @@ public class DatabaseAccess
   private PreparedStatement getLoan;
   private PreparedStatement addCustomer;
   private PreparedStatement addItem;
+  private PreparedStatement getCustomerByName;
+  private PreparedStatement getCustomerByLateFee;
   // TODO: add all new SQL statements here
 
   public DatabaseAccess()
@@ -51,11 +55,64 @@ public class DatabaseAccess
 
   public boolean prepareStatements()
   {
-    String getCustomerString = "select * from Customer where customerID = ?";
+    String getCustomerString = "select * from Customer where customerId = ?";
     String getLibrariesString = "select * from Library order by name";
 	String getLoanString = "select * from Loan where itemID = ?";
 	String addCustomerString = "insert into Customer values"; // might need to edit a little
     String addItemString = "insert into Item values";
+    String getCustomerByNameString = 
+    		"SELECT "+
+    			"*"+
+    		" FROM "+
+    			Customer.CUSTOMER+
+    			" JOIN "+
+    			Accesses.ACCESSES+
+    				" ON "+
+    				Customer.CUSTOMER_ID+ " = "+ Accesses.CUSTOMER_ID+
+    		" WHERE "+
+    			Customer.FIRST_NAME+" = ?"+
+    			" AND "+
+    			Accesses.LIBRARY_NAME+" = ?";
+    			
+    String getCustomerByLateFeeString = 
+    		
+    		"SELECT "+
+    				//Customer.CUSTOMER_ID+ ", "+
+    				//Customer.FIRST_NAME+ ", "+
+    				//Customer.LAST_NAME+
+    				"result.firstName, result.lastName, result.totalFines, result.customerId"+
+    		" FROM "+
+				"( SELECT "+
+	    			Customer.CUSTOMER_ID+ ", "+
+	    			Customer.FIRST_NAME+ ", "+
+	    			Customer.LAST_NAME+", "+
+	    			
+	    			"SUM( "+
+	    				Checkout.FINE_AMOUNT+
+	    			" ) as totalFines "+
+	    		" FROM "+
+	    			Customer.CUSTOMER+", "+
+	    			Checkout.CHECKOUT+
+	    		" WHERE "+
+	    			Customer.CUSTOMER_ID+" = "+Checkout.CUSTOMER_ID+
+	    		" GROUP BY "+
+	    			Customer.CUSTOMER_ID+", "+
+	    			Customer.FIRST_NAME+", "+
+	    			Customer.LAST_NAME+
+	    		" HAVING SUM( "+Checkout.FINE_AMOUNT+" ) > ?"+
+	    		") AS result, "+
+	    		
+				"( SELECT "+
+					"*"+
+				" FROM "+
+					Accesses.ACCESSES+
+				" WHERE "+
+					Accesses.LIBRARY_NAME+" = ?"+
+				") AS lib "+
+	    	" WHERE "+
+				"lib.customerId = result.customerId";
+	    		
+    		
 	// TODO: create any new SQL query strings here
 
     try
@@ -65,6 +122,8 @@ public class DatabaseAccess
 	  getLoan = conn.prepareStatement(getLoanString);
 	  addCustomer = conn.prepareStatement(addCustomerString);
 	  addItem = conn.prepareStatement(addItemString);
+	  getCustomerByName = conn.prepareStatement(getCustomerByNameString);
+	  getCustomerByLateFee = conn.prepareStatement(getCustomerByLateFeeString);
       // TODO: prepare any new statements here
       return true;
     }
@@ -146,10 +205,8 @@ public class DatabaseAccess
     {
       System.err.println("Error in getLibraries: " + e);
     }
-    finally
-    {
-      return libraries;
-    }
+    
+    return libraries;
   }
   
    public Loan getLoan(String itemID) 
@@ -261,6 +318,68 @@ public class DatabaseAccess
 	}     
   }
  
+  /**
+   * Returns all users with the first name given
+   * @param name
+   * @return An arraylist of all users matching the criteria
+   */
+  public List<Customer> findUserByName(String name, String library){
+	  ArrayList<Customer> customers = new ArrayList<Customer>();
+	  ResultSet rs;
+	  
+	  try{
+		  getCustomerByName.setString(1, name);
+		  getCustomerByName.setString(2, library);
+		  rs = getCustomerByName.executeQuery();
+	  
+		  while (rs.next()){
+		    Customer customer = new Customer();
+		    customer.customerID = rs.getString(Customer.CUSTOMER_ID);
+		    customer.lastName = rs.getString(Customer.LAST_NAME);
+		    customer.firstName = rs.getString(Customer.FIRST_NAME);
+		    customer.birthDate = rs.getDate(Customer.BIRTHDATE);
+		    
+		    customers.add(customer);
+		  }
+		  rs.close();
+	  } catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	  }
+	  
+	  return customers;
+  }
+  
+  public List<String> findCustomerByLateFee(float fee, String libraryName){
+	  ArrayList<String> customers = new ArrayList<String>();
+	  ResultSet rs;
+	  
+	  try{
+		  getCustomerByLateFee.setFloat(1, fee);
+		  getCustomerByLateFee.setString(2, libraryName);
+		  rs = getCustomerByLateFee.executeQuery();
+	  
+		  while (rs.next()){
+
+		    String customer = new String();
+  
+		    customer+= Customer.CUSTOMER+": ";
+		    customer+= "\n \t First Name: "+rs.getString("result.firstName");
+		    customer+= "\n \t Last Name: "+rs.getString("result.lastName");
+		    customer+= "\n \t Total Fines: "+rs.getFloat("result.totalFines");
+		    customer+= "\n \t Customer Id: "+rs.getString("result.customerId");
+		    
+		    customers.add(customer);
+		  }
+		  
+		  rs.close();
+	  } catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	  }
+	  
+	  return customers;
+  }
   
 
   // TODO: add any new database query/update helper methods here. Each method
