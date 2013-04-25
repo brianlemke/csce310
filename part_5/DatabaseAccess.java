@@ -20,6 +20,7 @@ public class DatabaseAccess
   private PreparedStatement getCustomerByName;
   private PreparedStatement getCustomerByLateFee;
   private PreparedStatement deleteEmployeeByID;
+  private PreparedStatement checkoutItem;
   // TODO: add all new SQL statements here
 
   public DatabaseAccess()
@@ -109,6 +110,9 @@ public class DatabaseAccess
 	    	" WHERE "+
 				"lib.customerId = result.customerId";	
 	String deleteEmployeeString = "DELETE FROM Employee WHERE employeeID = ?";
+	String checkoutItemString = "insert into Checkout(libraryName, customerID, " +
+	"itemID, dateOut) values (?, ?, ?, ?)";
+
 	// TODO: create any new SQL query strings here
 
     try
@@ -120,6 +124,7 @@ public class DatabaseAccess
       getCustomerByName = conn.prepareStatement(getCustomerByNameString);
       getCustomerByLateFee = conn.prepareStatement(getCustomerByLateFeeString);
 	  deleteEmployeeByID = conn.prepareStatement(deleteEmployeeString);
+	  checkoutItem = conn.prepareStatement(checkoutItemString);
       // TODO: prepare any new statements here
       return true;
     }
@@ -160,9 +165,35 @@ public class DatabaseAccess
     }
 	catch(SQLException e)
     {
-      System.err.println("Error in getCustomer: " + e);
+      System.err.println("Error in deleteEmployee: " + e);
 	  return false;
     }
+  }
+  
+  public boolean checkoutItem(Checkout c) {
+     try
+    {
+      checkoutItem.setString(1, c.libraryName);
+      checkoutItem.setString(2, c.customerID);
+      checkoutItem.setString(3, c.itemID);
+	  checkoutItem.setDate(4, c.dateOut);
+
+      int rowCount = addCustomer.executeUpdate();
+      if (rowCount == 1)
+      {
+        return true;
+      }
+      else
+      {
+        return false;
+      }
+    }
+	catch(SQLException e)
+    {
+      System.err.println("Error in checkoutItem: " + e);
+      return false;
+    }
+  
   }
  
   public Customer getCustomer(String customerID)

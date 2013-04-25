@@ -3,6 +3,7 @@ import java.util.List;
 import java.util.Scanner;
 import java.io.Console;
 import java.text.SimpleDateFormat;
+import java.sql.Date;
 import java.util.Locale;
 
 public class UserInterface
@@ -134,7 +135,22 @@ public class UserInterface
 
   private void checkoutItem()
   {
-    // TODO: this is a method stub
+    java.util.Date today = new java.util.Date();
+    java.sql.Date sqlToday = new java.sql.Date(today.getTime());
+    Checkout c = new Checkout();
+    c.itemID = readID("Enter the 20 character itemID: ");
+	c.customerID = readID("Enter the 20 character customerID: ");
+	c.libraryName = currentLibrary.name;
+	c.dateOut = sqlToday;
+	 if (db.checkoutItem(c))
+    {
+      System.out.println("Checkout successful!");
+    }
+    else
+    {
+      System.out.println("Oops. There was an error checking out.");
+    }	
+	
   }
 
   private void addItem()
@@ -189,7 +205,6 @@ public class UserInterface
       System.out.println("Oops. There was an error deleting the employee.");
     }
 	
-    // TODO: this is a method stub
   }
 
   private void addBook() 
