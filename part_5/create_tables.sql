@@ -1,3 +1,5 @@
+use csce310;
+
 create table Library (
   name      varchar(255) primary key,
   address   varchar(255),

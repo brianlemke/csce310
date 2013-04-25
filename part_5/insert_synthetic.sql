@@ -1,3 +1,5 @@
+use csce310;
+
 insert into Accesses (customerID, libraryName) values 
 ('94505323847390144713', 'O''Kon, Hegmann and Mante'),
 ('95627498614410841085', 'Auer-Feil'),

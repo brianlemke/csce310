@@ -1,3 +1,5 @@
+use csce310;
+
 INSERT INTO Library
 VALUES 
   ('Green Public Library', '1000 N. Main St.', 'Green','76139'),
