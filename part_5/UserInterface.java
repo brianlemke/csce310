@@ -33,11 +33,10 @@ public class UserInterface
     ArrayList<String> choices = new ArrayList<String>();
     choices.add("Change current library");
     choices.add("Find a customer");
-    choices.add("Find a loan");
     choices.add("Checkout an item");
     choices.add("Add a new item");
     choices.add("Add a new customer");
-    choices.add("Pay a fine");
+    choices.add("Remove an employee");
     choices.add("Exit");
     String prompt = "Enter the number of your choice: ";
 
@@ -58,21 +57,18 @@ public class UserInterface
         searchCustomers();
         break;
       case 3:
-        searchLoans();
-        break;
-      case 4:
         checkoutItem();
         break;
-      case 5:
+      case 4:
         addItem();
         break;
-      case 6:
+      case 5:
         addCustomer();
         break;
-      case 7:
-        payFine();
+      case 6:
+        removeEmployee();
         break;
-      case 8:
+      case 7:
         return false; // Indicate the program should terminate
       default:
         assert(false);
@@ -136,11 +132,6 @@ public class UserInterface
 		}
   }
 
-  private void searchLoans()
-  {
-    // TODO: this is a method stub
-  }
-
   private void checkoutItem()
   {
     // TODO: this is a method stub
@@ -186,11 +177,11 @@ public class UserInterface
     }
   }
 
-  private void payFine()
+  private void removeEmployee()
   {
     // TODO: this is a method stub
   }
-  
+
   private void addBook() 
   {
     Book b = new Book();
