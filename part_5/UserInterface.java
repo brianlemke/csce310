@@ -203,8 +203,6 @@ public class UserInterface
     {
       System.out.println("Oops. There was an error deleting the employee.");
     }
-	
-    // TODO: this is a method stub
   }
 
   // Prompt the user to fill out information to add a new book to the database
