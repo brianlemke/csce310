@@ -179,6 +179,16 @@ public class UserInterface
 
   private void removeEmployee()
   {
+	String id = readID("Enter 20 character employeeID to be removed: ");
+	 if (db.deleteEmployee(id))
+    {
+      System.out.println("Employee successfully Deleted!");
+    }
+    else
+    {
+      System.out.println("Oops. There was an error deleting the employee.");
+    }
+	
     // TODO: this is a method stub
   }
 

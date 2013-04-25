@@ -19,6 +19,7 @@ public class DatabaseAccess
   private PreparedStatement addItem;
   private PreparedStatement getCustomerByName;
   private PreparedStatement getCustomerByLateFee;
+  private PreparedStatement deleteEmployeeByID;
   // TODO: add all new SQL statements here
 
   public DatabaseAccess()
@@ -107,6 +108,7 @@ public class DatabaseAccess
 				") AS lib "+
 	    	" WHERE "+
 				"lib.customerId = result.customerId";	
+	String deleteEmployeeString = "DELETE FROM Employee WHERE employeeID = ?";
 	// TODO: create any new SQL query strings here
 
     try
@@ -117,6 +119,7 @@ public class DatabaseAccess
       addItem = conn.prepareStatement(addItemString);
       getCustomerByName = conn.prepareStatement(getCustomerByNameString);
       getCustomerByLateFee = conn.prepareStatement(getCustomerByLateFeeString);
+	  deleteEmployeeByID = conn.prepareStatement(deleteEmployeeString);
       // TODO: prepare any new statements here
       return true;
     }
@@ -141,6 +144,26 @@ public class DatabaseAccess
     }
   }
 
+  public boolean deleteEmployee(String employeeID) {
+    try
+    {
+       deleteEmployeeByID.setString(1, employeeID);
+       int rowCount = deleteEmployeeByID.executeUpdate();
+        if (rowCount == 1)
+        {
+          return true;
+        }
+        else
+        {
+          return false;
+        }
+    }
+	catch(SQLException e)
+    {
+      System.err.println("Error in getCustomer: " + e);
+	  return false;
+    }
+  }
  
   public Customer getCustomer(String customerID)
   {
