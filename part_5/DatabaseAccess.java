@@ -361,62 +361,62 @@ public class DatabaseAccess
   // Returns all users with the designated first name who access the designated
   // library
   public List<Customer> findUserByName(String name, String library){
-	  ArrayList<Customer> customers = new ArrayList<Customer>();
-	  ResultSet rs;
-	  
-	  try{
-		  getCustomerByName.setString(1, name);
-		  getCustomerByName.setString(2, library);
-		  rs = getCustomerByName.executeQuery();
-	  
-		  while (rs.next()){
-		    Customer customer = new Customer();
-		    customer.customerID = rs.getString(Customer.CUSTOMER_ID);
-		    customer.lastName = rs.getString(Customer.LAST_NAME);
-		    customer.firstName = rs.getString(Customer.FIRST_NAME);
-		    customer.birthDate = rs.getDate(Customer.BIRTHDATE);
-		    
-		    customers.add(customer);
-		  }
-		  rs.close();
-	  } catch (SQLException e) {
-		  System.err.println("Error in findUserByName");
-		e.printStackTrace();
-	  }
-	  
-	  return customers;
+    ArrayList<Customer> customers = new ArrayList<Customer>();
+    ResultSet rs;
+
+    try{
+      getCustomerByName.setString(1, name);
+      getCustomerByName.setString(2, library);
+      rs = getCustomerByName.executeQuery();
+
+      while (rs.next()){
+        Customer customer = new Customer();
+        customer.customerID = rs.getString(Customer.CUSTOMER_ID);
+        customer.lastName = rs.getString(Customer.LAST_NAME);
+        customer.firstName = rs.getString(Customer.FIRST_NAME);
+        customer.birthDate = rs.getDate(Customer.BIRTHDATE);
+
+        customers.add(customer);
+      }
+      rs.close();
+    } catch (SQLException e) {
+      System.err.println("Error in findUserByName");
+      e.printStackTrace();
+    }
+
+    return customers;
   }
   
   // Find all users of the designated library who have at least a certain fine
   // amount
   public List<String> findCustomerByLateFee(float fee, String libraryName){
-	  ArrayList<String> customers = new ArrayList<String>();
-	  ResultSet rs;
-	  
-	  try{
-		  getCustomerByLateFee.setFloat(1, fee);
-		  getCustomerByLateFee.setString(2, libraryName);
-		  rs = getCustomerByLateFee.executeQuery();
-	  
-		  while (rs.next()){
+    ArrayList<String> customers = new ArrayList<String>();
+    ResultSet rs;
 
-		    String customer = new String();
-  
-		    customer+= Customer.CUSTOMER+": ";
-		    customer+= "\n \t First Name: "+rs.getString("result.firstName");
-		    customer+= "\n \t Last Name: "+rs.getString("result.lastName");
-		    customer+= "\n \t Total Fines: "+rs.getFloat("result.totalFines");
-		    customer+= "\n \t Customer Id: "+rs.getString("result.customerId");
-		    
-		    customers.add(customer);
-		  }
-		  
-		  rs.close();
-	  } catch (SQLException e) {
-		  System.err.println("Error in findCustomerByLateFee");
-		  e.printStackTrace();
-	  }
-	  
-	  return customers;
+    try{
+      getCustomerByLateFee.setFloat(1, fee);
+      getCustomerByLateFee.setString(2, libraryName);
+      rs = getCustomerByLateFee.executeQuery();
+
+      while (rs.next()){
+
+        String customer = new String();
+
+        customer+= Customer.CUSTOMER+": ";
+        customer+= "\n \t First Name: "+rs.getString("result.firstName");
+        customer+= "\n \t Last Name: "+rs.getString("result.lastName");
+        customer+= "\n \t Total Fines: "+rs.getFloat("result.totalFines");
+        customer+= "\n \t Customer Id: "+rs.getString("result.customerId");
+
+        customers.add(customer);
+      }
+
+      rs.close();
+    } catch (SQLException e) {
+      System.err.println("Error in findCustomerByLateFee");
+      e.printStackTrace();
+    }
+
+    return customers;
   }
 }

@@ -102,44 +102,44 @@ public class UserInterface
   // Allow the user to search for customers by first name, or to find all
   // customers with high late fees
   private void searchCustomers(){
-	  	assert(currentLibrary != null);
+    assert(currentLibrary != null);
 
-                // Display a small sub-menu
-		String header = "Searching " + currentLibrary.name + "for customer";
-		ArrayList<String> choices = new ArrayList<String>();
-		choices.add("Find By First Name");
-		choices.add("Find By Late Fees");
-		choices.add("Exit");
-		String prompt = "Enter the number of your choice: ";
-		
-		System.out.println(header);
-		for (int i = 0; i < choices.size(); i++){
-		  System.out.printf("%2d - %s\n", i + 1, choices.get(i));
-		}
-		
-		int selection = readSelection(prompt, choices.size());
-		
-		switch(selection){
-		case 1:
-			String name = c.readLine("Enter the First Name: ");
-			for(Customer customer : db.findUserByName(name, currentLibrary.name)){
-				System.out.println("Customer: ");
-				System.out.println("\t First Name: "+customer.firstName);
-				System.out.println("\t Last Name: "+customer.lastName);
-				System.out.println("\t Birthday: "+customer.birthDate);
-				System.out.println("\t ID: "+customer.customerID);
-			}
-			break;
-		case 2:
-			String feestring = c.readLine("Enter minimum Late Fee: ");
-			float fee = Float.parseFloat(feestring);
-			for(String customer : db.findCustomerByLateFee(fee, currentLibrary.name)){
-				System.out.println(customer);
-			}
-			break;
-		default:
-			break;
-		}
+    // Display a small sub-menu
+    String header = "Searching " + currentLibrary.name + "for customer";
+    ArrayList<String> choices = new ArrayList<String>();
+    choices.add("Find By First Name");
+    choices.add("Find By Late Fees");
+    choices.add("Exit");
+    String prompt = "Enter the number of your choice: ";
+
+    System.out.println(header);
+    for (int i = 0; i < choices.size(); i++){
+      System.out.printf("%2d - %s\n", i + 1, choices.get(i));
+    }
+
+    int selection = readSelection(prompt, choices.size());
+
+    switch(selection){
+      case 1:
+        String name = c.readLine("Enter the First Name: ");
+        for(Customer customer : db.findUserByName(name, currentLibrary.name)){
+          System.out.println("Customer: ");
+          System.out.println("\t First Name: "+customer.firstName);
+          System.out.println("\t Last Name: "+customer.lastName);
+          System.out.println("\t Birthday: "+customer.birthDate);
+          System.out.println("\t ID: "+customer.customerID);
+        }
+        break;
+      case 2:
+        String feestring = c.readLine("Enter minimum Late Fee: ");
+        float fee = Float.parseFloat(feestring);
+        for(String customer : db.findCustomerByLateFee(fee, currentLibrary.name)){
+          System.out.println(customer);
+        }
+        break;
+      default:
+        break;
+    }
   }
 
   // Allow the user to checkout a specific item to a library customer
