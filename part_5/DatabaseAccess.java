@@ -72,14 +72,9 @@ public class DatabaseAccess
     		" WHERE "+
     			Customer.FIRST_NAME+" = ?"+
     			" AND "+
-    			Accesses.LIBRARY_NAME+" = ?";
-    			
-    String getCustomerByLateFeeString = 
-    		
+    			Accesses.LIBRARY_NAME+" = ?";			
+    String getCustomerByLateFeeString = 	
     		"SELECT "+
-    				//Customer.CUSTOMER_ID+ ", "+
-    				//Customer.FIRST_NAME+ ", "+
-    				//Customer.LAST_NAME+
     				"result.firstName, result.lastName, result.totalFines, result.customerId"+
     		" FROM "+
 				"( SELECT "+
@@ -110,9 +105,7 @@ public class DatabaseAccess
 					Accesses.LIBRARY_NAME+" = ?"+
 				") AS lib "+
 	    	" WHERE "+
-				"lib.customerId = result.customerId";
-	    		
-    		
+				"lib.customerId = result.customerId";	
 	// TODO: create any new SQL query strings here
 
     try
@@ -343,7 +336,7 @@ public class DatabaseAccess
 		  }
 		  rs.close();
 	  } catch (SQLException e) {
-		// TODO Auto-generated catch block
+		  System.err.println("Error in findUserByName");
 		e.printStackTrace();
 	  }
 	  
@@ -374,8 +367,8 @@ public class DatabaseAccess
 		  
 		  rs.close();
 	  } catch (SQLException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
+		  System.err.println("Error in findCustomerByLateFee");
+		  e.printStackTrace();
 	  }
 	  
 	  return customers;
