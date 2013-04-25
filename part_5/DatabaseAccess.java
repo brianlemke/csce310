@@ -25,7 +25,6 @@ public class DatabaseAccess
   private PreparedStatement deleteEmployeeByID;
   private PreparedStatement checkoutItem;
 
-
   public DatabaseAccess()
   {
     conn = null;
@@ -118,8 +117,8 @@ public class DatabaseAccess
 	    	" WHERE "+
 				"lib.customerId = result.customerId";	
 	String deleteEmployeeString = "DELETE FROM Employee WHERE employeeID = ?";
-	String checkoutItemString = "insert into Checkout(libraryName, customerID, " +
-	"itemID, dateOut) values (?, ?, ?, ?)";
+        String checkoutItemString = "insert into Checkout(libraryName, customerID, " +
+          "itemID, dateOut) values (?, ?, ?, ?)";
 
 
     // Create PreparedStatement objects
@@ -131,7 +130,7 @@ public class DatabaseAccess
       addItem = conn.prepareStatement(addItemString);
       getCustomerByName = conn.prepareStatement(getCustomerByNameString);
       getCustomerByLateFee = conn.prepareStatement(getCustomerByLateFeeString);
-	  checkoutItem = conn.prepareStatement(checkoutItemString);
+      checkoutItem = conn.prepareStatement(checkoutItemString);
       deleteEmployeeByID = conn.prepareStatement(deleteEmployeeString);
 
       return true;
@@ -180,15 +179,18 @@ public class DatabaseAccess
     }
   }
   
-  public boolean checkoutItem(Checkout c) {
-     try
+  // Create a new checkout record in the database
+  public boolean checkoutItem(Checkout c)
+  {
+    try
     {
+      System.out.println(c.libraryName);
       checkoutItem.setString(1, c.libraryName);
       checkoutItem.setString(2, c.customerID);
       checkoutItem.setString(3, c.itemID);
-	  checkoutItem.setDate(4, c.dateOut);
+      checkoutItem.setDate(4, c.dateOut);
 
-      int rowCount = addCustomer.executeUpdate();
+      int rowCount = checkoutItem.executeUpdate();
       if (rowCount == 1)
       {
         return true;
@@ -198,7 +200,7 @@ public class DatabaseAccess
         return false;
       }
     }
-	catch(SQLException e)
+    catch(SQLException e)
     {
       System.err.println("Error in checkoutItem: " + e);
       return false;

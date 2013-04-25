@@ -150,10 +150,10 @@ public class UserInterface
     java.sql.Date sqlToday = new java.sql.Date(today.getTime());
     Checkout c = new Checkout();
     c.itemID = readID("Enter the 20 character itemID: ");
-	c.customerID = readID("Enter the 20 character customerID: ");
-	c.libraryName = currentLibrary.name;
-	c.dateOut = sqlToday;
-	 if (db.checkoutItem(c))
+    c.customerID = readID("Enter the 20 character customerID: ");
+    c.libraryName = currentLibrary.name;
+    c.dateOut = sqlToday;
+    if (db.checkoutItem(c))
     {
       System.out.println("Checkout successful!");
     }
