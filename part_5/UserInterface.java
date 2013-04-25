@@ -4,7 +4,6 @@ import java.util.Scanner;
 import java.io.Console;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
-import java.util.Date;
 
 public class UserInterface
 {
@@ -150,51 +149,41 @@ public class UserInterface
   private void addItem()
   {
     String prompt = "What type of item is it? \n 1. Book \n 2. Movie \n 3. Audio \n";
-	int type = readSelection(prompt, 3);
-	switch (type) {
-	  case 1: 
-			  Book b = new Book(); 
-			  b = bookPrompt(b);
-			  db.addBook(b);
-			  break;
-	  case 2: 
-			  Movie m = new Movie();
-	          m = moviePrompt(m);
-			  db.addMovie(m);
-	          break;
-	  case 3: 
-			  Audio a = new Audio();  
-	          a = audioPrompt(a);
-			  db.addAudio(a);
-	          break;
-	}
+    int type = readSelection(prompt, 3);
+    switch (type) {
+      case 1: 
+        addBook();
+        break;
+      case 2: 
+        addMovie();
+        break;
+      case 3: 
+        addAudio();
+        break;
+      default:
+        assert(false);
+    }
 	
   }
 
   private void addCustomer()
   {
     Customer c = new Customer();
-    System.out.println("Customer(customerID,lastName,firstName,birthDate)");
-	System.out.println("20 character customer ID");
-	c.customerID = sc.next();
-	System.out.println("Customer's last name?");
-	c.lastName = sc.next();
-	System.out.println("Customer's first name?");
-	c.firstName = sc.next();
-	System.out.println("Customer's date of birth?");
-	String str = sc.nextLine();	
-	try 
-	{
-	  Date date = new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH).parse(str);
-	  c.birthDate = date;
-	  
-	}
-	catch(java.text.ParseException e) 
-	{
-	  System.err.println("Unable to parse date, exception: ");
-	}
-	db.addCustomer(c);
-	
+    c.customerID = readID("Enter 20 character customer ID: ");
+    System.out.print("Enter customer's last name: ");
+    c.lastName = sc.nextLine();
+    System.out.print("Enter customer's first name: ");
+    c.firstName = sc.nextLine();
+    c.birthDate = readDate("Enter customers birth date (e.g. January 13, 2012): ");
+
+    if (db.addCustomer(c))
+    {
+      System.out.println("Customer successfully added!");
+    }
+    else
+    {
+      System.out.println("Oops. There was an error adding the new customer.");
+    }
   }
 
   private void payFine()
@@ -202,66 +191,79 @@ public class UserInterface
     // TODO: this is a method stub
   }
   
-  private Book bookPrompt(Book b) 
+  private void addBook() 
   {
-     System.out.println("Book(itemID,libraryName,mediaType,author,title,year,length,genre)");
-     System.out.println("itemID: ");
-	 b.itemID = sc.next();
-	 System.out.println("libraryName: ");
-	 b.libraryName = sc.next();
-	 b.mediaType = "book";
-	 System.out.println("author: ");
-	 b.author = sc.next();
-	 System.out.println("title: ");
-	 b.title = sc.next();
-	 System.out.println("year: ");
-	 b.year = sc.nextInt();
-	 System.out.println("length: ");
-	 b.length = sc.nextInt();
-	 System.out.println("genre: ");
-	 b.genre = sc.next();
-	 return b;
+    Book b = new Book();
+    b.itemID = readID("Enter 20 character item ID: ");
+    b.libraryName = currentLibrary.name;
+    b.mediaType = "book";
+    System.out.print("Enter the author's full name: ");
+    b.author = sc.nextLine();
+    System.out.print("Enter the title: ");
+    b.title = sc.nextLine();
+    b.year = readInt("Enter the year: ", 1902, 2155);
+    b.length = readInt("Enter the number of pages: ", 0, -1);
+    System.out.print("Enter the genre: ");
+    b.genre = sc.nextLine();
+
+    if (db.addBook(b))
+    {
+      System.out.println("Book successfully added!");
+    }
+    else
+    {
+      System.out.println("Oops. There was an error adding the new book.");
+    }
   }
 
-  private Movie moviePrompt(Movie m)
+  private void addMovie()
   {
+    Movie m = new Movie();
 
-	System.out.println("Movie(itemID,libraryName,mediaType,title,year,length,genre)");
-	System.out.println("itemID: ");
-	m.itemID = sc.next();
-	System.out.println("libraryName: ");
-	m.libraryName = sc.next();
-	m.mediaType = "movie";
-	System.out.println("title: ");
-	m.title = sc.next();
-	System.out.println("year: ");
-	m.year = sc.nextInt();
-	System.out.println("length: ");
-	m.length = sc.nextInt();
-	System.out.println("genre: ");
-	m.genre = sc.next();
-	return m;
+    m.itemID = readID("Enter 20 character item ID: ");
+    m.libraryName = currentLibrary.name;
+    m.mediaType = "movie";
+    System.out.print("Enter the title: ");
+    m.title = sc.nextLine();
+    m.year = readInt("Enter the yaer: ", 1902, 2155);
+    m.length = readInt("Enter the length in minutes: ", 0, -1);
+    System.out.print("Enter the genre: ");
+    m.genre = sc.nextLine();
+
+    if (db.addMovie(m))
+    {
+      System.out.println("Movie successfully added!");
+    }
+    else
+    {
+      System.out.println("Oops. There was an error adding the new book.");
+    }
   }
   
-  private Audio audioPrompt(Audio a)
+  private void addAudio()
   {
-    System.out.println("Audio(itemID,libraryName,mediaType,title,year,length,genre,artist)");
-    System.out.println("itemID: ");
-	a.itemID = sc.next();
-	System.out.println("libraryName: ");
-	a.libraryName = sc.next();
-	a.mediaType = "audio";
-	System.out.println("title: ");
-	a.title = sc.next();
-	System.out.println("year: ");
-	a.year = sc.nextInt();
-	System.out.println("length: ");
-	a.length = sc.nextInt();
-	System.out.println("genre: ");
-	a.genre = sc.next();
-	System.out.println("artist: ");
-	a.artist = sc.next();
-	return a;
+    Audio a = new Audio();
+
+    a.itemID = readID("Enter 20 character item ID: ");
+    a.libraryName = currentLibrary.name;
+    a.mediaType = "audio";
+    System.out.print("Enter the title: ");
+    a.title = sc.nextLine();
+    a.year = readInt("Enter the year: ", 1902, 2155);
+    a.length = readInt("Enter the length in minutes: ", 0, -1);
+    System.out.print("Enter the genre: ");
+    a.genre = sc.nextLine();
+    System.out.print("Enter the artist's full name: ");
+    a.artist = sc.nextLine();
+
+    if (db.addAudio(a))
+    {
+      System.out.println("Audio successfully added!");
+    }
+    else
+    {
+      System.out.println("Oops. There was an error adding the new audio.");
+    }
   }
 
   private int readSelection(String prompt, int maxSelection)
@@ -295,5 +297,88 @@ public class UserInterface
     }
 
     return selection;
+  }
+
+  private String readID(String prompt)
+  {
+    String id = "";
+    boolean valid = false;
+    System.out.print(prompt);
+
+    while (!valid)
+    {
+      id = sc.nextLine();
+      if (id.length() == 20)
+      {
+        valid = true;
+      }
+      else
+      {
+        System.out.print("ID must be 20 characters: ");
+      }
+    }
+
+    return id;
+  }
+
+  private java.sql.Date readDate(String prompt)
+  {
+    SimpleDateFormat parser = new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH);
+
+    boolean valid = false;
+    java.util.Date date = null;
+    System.out.print(prompt);
+
+    while (!valid)
+    {
+      String entry = sc.nextLine();
+      try
+      {
+        date = parser.parse(entry);
+        valid = true;
+      }
+      catch(Exception e)
+      {
+        System.out.print("Date must be like January 13, 2012: ");
+      }
+    }
+
+    return new java.sql.Date(date.getTime());
+  }
+
+  private int readInt(String prompt, int min, int max)
+  {
+    int result = -1;
+
+    boolean valid = false;
+    System.out.print(prompt);
+
+    while (!valid)
+    {
+      try
+      {
+        result = sc.nextInt();
+        sc.nextLine();
+        if (min >= 0 && result < min)
+        {
+          System.out.print("Integer must be greater than " + min + ": ");
+        }
+        else if (max >= 8 && result > max)
+        {
+          System.out.print("Integer must be less than " + max + ": ");
+        }
+        else
+        {
+          valid = true;
+        }
+      }
+      catch(Exception e)
+      {
+        System.out.print("Please enter an integer: ");
+        sc.nextLine();
+      }
+    }
+
+    return result;
   }
 }
