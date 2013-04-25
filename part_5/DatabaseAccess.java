@@ -3,16 +3,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+// Handles all direct interaction with the database through PreparedStatements 
+// and custom functions with high-level interfaces
 public class DatabaseAccess
 {
   private Connection conn;
 
+  // Database connection information
   public static final String databaseUser     = "csce310";
   public static final String databasePassword = "";
   public static final String databaseName     = "csce310";
   public static final String databaseHost     = "localhost";
 
-
+  // All statements are prepared on object init
   private PreparedStatement getCustomer;
   private PreparedStatement getLibraries;
   private PreparedStatement addCustomer;
@@ -21,15 +24,17 @@ public class DatabaseAccess
   private PreparedStatement getCustomerByLateFee;
   private PreparedStatement deleteEmployeeByID;
   private PreparedStatement checkoutItem;
-  // TODO: add all new SQL statements here
+
 
   public DatabaseAccess()
   {
     conn = null;
   }
 
+  // Connect to the database and prepare all statements
   public boolean init()
   {
+    // Form database url from constant parameters
     String url = "jdbc:mysql://" + databaseHost + "/" + databaseName;
     if (databaseUser != "")
     {
@@ -40,6 +45,7 @@ public class DatabaseAccess
       }
     }
 
+    // Attempt to connect to the database and prepare statements
     try
     {
       Class.forName("com.mysql.jdbc.Driver").newInstance();
@@ -54,8 +60,10 @@ public class DatabaseAccess
     }
   }
 
+  // Form all SQL queries and prepare statements ahead of time
   public boolean prepareStatements()
   {
+    // Form all SQL statements with '?' for data fill-in
     String getCustomerString = "select * from Customer where customerId = ?";
     String getLibrariesString = "select * from Library order by name";
     String addCustomerString = "insert into Customer(customerID, lastName, " +
@@ -113,8 +121,8 @@ public class DatabaseAccess
 	String checkoutItemString = "insert into Checkout(libraryName, customerID, " +
 	"itemID, dateOut) values (?, ?, ?, ?)";
 
-	// TODO: create any new SQL query strings here
 
+    // Create PreparedStatement objects
     try
     {
       getCustomer = conn.prepareStatement(getCustomerString);
@@ -123,9 +131,9 @@ public class DatabaseAccess
       addItem = conn.prepareStatement(addItemString);
       getCustomerByName = conn.prepareStatement(getCustomerByNameString);
       getCustomerByLateFee = conn.prepareStatement(getCustomerByLateFeeString);
-	  deleteEmployeeByID = conn.prepareStatement(deleteEmployeeString);
 	  checkoutItem = conn.prepareStatement(checkoutItemString);
-      // TODO: prepare any new statements here
+      deleteEmployeeByID = conn.prepareStatement(deleteEmployeeString);
+
       return true;
     }
     catch(SQLException e)
@@ -135,6 +143,7 @@ public class DatabaseAccess
     }
   }
 
+  // Close the database connection
   public boolean terminate()
   {
     try
@@ -149,6 +158,7 @@ public class DatabaseAccess
     }
   }
 
+  // Delete the employee designated by employeeID from the system
   public boolean deleteEmployee(String employeeID) {
     try
     {
@@ -196,6 +206,7 @@ public class DatabaseAccess
   
   }
  
+  // Get the customer identified by customerID from the database
   public Customer getCustomer(String customerID)
   {
     try
@@ -228,6 +239,7 @@ public class DatabaseAccess
     }
   }
 
+  // Get a list of all the libraries in the system
   public ArrayList<Library> getLibraries()
   {
     ArrayList<Library> libraries = new ArrayList<Library>();
@@ -256,6 +268,7 @@ public class DatabaseAccess
     return libraries;
   }
 
+  // Insert a new customer into the database
   public boolean addCustomer(Customer c) 
   {
     try
@@ -282,6 +295,7 @@ public class DatabaseAccess
     }
   }
 
+  // Insert a new book into the database
   public boolean addBook(Book b)
   {
     try
@@ -313,6 +327,7 @@ public class DatabaseAccess
     }
   }
 
+  // Insert a new movie into the database
   public boolean addMovie(Movie m)
   {
     try
@@ -344,6 +359,7 @@ public class DatabaseAccess
     }
   }
 
+  // Insert a new audio item into the database
   public boolean addAudio(Audio a)
   {
     try
@@ -375,71 +391,65 @@ public class DatabaseAccess
     }
   }
  
-  /**
-   * Returns all users with the first name given
-   * @param name
-   * @return An arraylist of all users matching the criteria
-   */
+  // Returns all users with the designated first name who access the designated
+  // library
   public List<Customer> findUserByName(String name, String library){
-	  ArrayList<Customer> customers = new ArrayList<Customer>();
-	  ResultSet rs;
-	  
-	  try{
-		  getCustomerByName.setString(1, name);
-		  getCustomerByName.setString(2, library);
-		  rs = getCustomerByName.executeQuery();
-	  
-		  while (rs.next()){
-		    Customer customer = new Customer();
-		    customer.customerID = rs.getString(Customer.CUSTOMER_ID);
-		    customer.lastName = rs.getString(Customer.LAST_NAME);
-		    customer.firstName = rs.getString(Customer.FIRST_NAME);
-		    customer.birthDate = rs.getDate(Customer.BIRTHDATE);
-		    
-		    customers.add(customer);
-		  }
-		  rs.close();
-	  } catch (SQLException e) {
-		  System.err.println("Error in findUserByName");
-		e.printStackTrace();
-	  }
-	  
-	  return customers;
+    ArrayList<Customer> customers = new ArrayList<Customer>();
+    ResultSet rs;
+
+    try{
+      getCustomerByName.setString(1, name);
+      getCustomerByName.setString(2, library);
+      rs = getCustomerByName.executeQuery();
+
+      while (rs.next()){
+        Customer customer = new Customer();
+        customer.customerID = rs.getString(Customer.CUSTOMER_ID);
+        customer.lastName = rs.getString(Customer.LAST_NAME);
+        customer.firstName = rs.getString(Customer.FIRST_NAME);
+        customer.birthDate = rs.getDate(Customer.BIRTHDATE);
+
+        customers.add(customer);
+      }
+      rs.close();
+    } catch (SQLException e) {
+      System.err.println("Error in findUserByName");
+      e.printStackTrace();
+    }
+
+    return customers;
   }
   
+  // Find all users of the designated library who have at least a certain fine
+  // amount
   public List<String> findCustomerByLateFee(float fee, String libraryName){
-	  ArrayList<String> customers = new ArrayList<String>();
-	  ResultSet rs;
-	  
-	  try{
-		  getCustomerByLateFee.setFloat(1, fee);
-		  getCustomerByLateFee.setString(2, libraryName);
-		  rs = getCustomerByLateFee.executeQuery();
-	  
-		  while (rs.next()){
+    ArrayList<String> customers = new ArrayList<String>();
+    ResultSet rs;
 
-		    String customer = new String();
-  
-		    customer+= Customer.CUSTOMER+": ";
-		    customer+= "\n \t First Name: "+rs.getString("result.firstName");
-		    customer+= "\n \t Last Name: "+rs.getString("result.lastName");
-		    customer+= "\n \t Total Fines: "+rs.getFloat("result.totalFines");
-		    customer+= "\n \t Customer Id: "+rs.getString("result.customerId");
-		    
-		    customers.add(customer);
-		  }
-		  
-		  rs.close();
-	  } catch (SQLException e) {
-		  System.err.println("Error in findCustomerByLateFee");
-		  e.printStackTrace();
-	  }
-	  
-	  return customers;
+    try{
+      getCustomerByLateFee.setFloat(1, fee);
+      getCustomerByLateFee.setString(2, libraryName);
+      rs = getCustomerByLateFee.executeQuery();
+
+      while (rs.next()){
+
+        String customer = new String();
+
+        customer+= Customer.CUSTOMER+": ";
+        customer+= "\n \t First Name: "+rs.getString("result.firstName");
+        customer+= "\n \t Last Name: "+rs.getString("result.lastName");
+        customer+= "\n \t Total Fines: "+rs.getFloat("result.totalFines");
+        customer+= "\n \t Customer Id: "+rs.getString("result.customerId");
+
+        customers.add(customer);
+      }
+
+      rs.close();
+    } catch (SQLException e) {
+      System.err.println("Error in findCustomerByLateFee");
+      e.printStackTrace();
+    }
+
+    return customers;
   }
-
-  // TODO: add any new database query/update helper methods here. Each method
-  // should use PreparedStatements declared above. The methods should accept 
-  // parameters and return values that use the custom data types, rather than
-  // ResultSets.
 }

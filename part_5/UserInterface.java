@@ -8,11 +8,12 @@ import java.util.Locale;
 
 public class UserInterface
 {
-  private DatabaseAccess db;
+  private DatabaseAccess db; // handles all database queries
   private Scanner sc;
   private Library currentLibrary;
   Console c = System.console();
 
+  // Initialize the member variables
   public UserInterface(DatabaseAccess db)
   {
     this.db = db;
@@ -20,12 +21,15 @@ public class UserInterface
     currentLibrary = null;
   }
 
+  // Start the main menu loop
   public void run()
   {
     selectLibrary();
     while (mainMenu());
   }
 
+  // Display the main menu and prompt for a selection. Upon a valid selection,
+  // pass control to the submenu function
   private boolean mainMenu()
   {
     assert(currentLibrary != null);
@@ -72,12 +76,15 @@ public class UserInterface
       case 7:
         return false; // Indicate the program should terminate
       default:
+        // readSelection ensures that the selection index is valid
         assert(false);
     }
 
     return true; // Indicate that we should show the main menu again
   }
 
+  // Prompt the user to select the currently-used library from a list of all
+  // libraries in the system
   private void selectLibrary()
   {
     ArrayList<Library> libraries = db.getLibraries();
@@ -93,46 +100,50 @@ public class UserInterface
     currentLibrary = libraries.get(libraryIndex - 1);
   }
 
+  // Allow the user to search for customers by first name, or to find all
+  // customers with high late fees
   private void searchCustomers(){
-	  	assert(currentLibrary != null);
+    assert(currentLibrary != null);
 
-		String header = "Searching " + currentLibrary.name + "for customer";
-		ArrayList<String> choices = new ArrayList<String>();
-		choices.add("Find By First Name");
-		choices.add("Find By Late Fees");
-		choices.add("Exit");
-		String prompt = "Enter the number of your choice: ";
-		
-		System.out.println(header);
-		for (int i = 0; i < choices.size(); i++){
-		  System.out.printf("%2d - %s\n", i + 1, choices.get(i));
-		}
-		
-		int selection = readSelection(prompt, choices.size());
-		
-		switch(selection){
-		case 1:
-			String name = c.readLine("Enter the First Name: ");
-			for(Customer customer : db.findUserByName(name, currentLibrary.name)){
-				System.out.println("Customer: ");
-				System.out.println("\t First Name: "+customer.firstName);
-				System.out.println("\t Last Name: "+customer.lastName);
-				System.out.println("\t Birthday: "+customer.birthDate);
-				System.out.println("\t ID: "+customer.customerID);
-			}
-			break;
-		case 2:
-			String feestring = c.readLine("Enter minimum Late Fee: ");
-			float fee = Float.parseFloat(feestring);
-			for(String customer : db.findCustomerByLateFee(fee, currentLibrary.name)){
-				System.out.println(customer);
-			}
-			break;
-		default:
-			break;
-		}
+    // Display a small sub-menu
+    String header = "Searching " + currentLibrary.name + "for customer";
+    ArrayList<String> choices = new ArrayList<String>();
+    choices.add("Find By First Name");
+    choices.add("Find By Late Fees");
+    choices.add("Exit");
+    String prompt = "Enter the number of your choice: ";
+
+    System.out.println(header);
+    for (int i = 0; i < choices.size(); i++){
+      System.out.printf("%2d - %s\n", i + 1, choices.get(i));
+    }
+
+    int selection = readSelection(prompt, choices.size());
+
+    switch(selection){
+      case 1:
+        String name = c.readLine("Enter the First Name: ");
+        for(Customer customer : db.findUserByName(name, currentLibrary.name)){
+          System.out.println("Customer: ");
+          System.out.println("\t First Name: "+customer.firstName);
+          System.out.println("\t Last Name: "+customer.lastName);
+          System.out.println("\t Birthday: "+customer.birthDate);
+          System.out.println("\t ID: "+customer.customerID);
+        }
+        break;
+      case 2:
+        String feestring = c.readLine("Enter minimum Late Fee: ");
+        float fee = Float.parseFloat(feestring);
+        for(String customer : db.findCustomerByLateFee(fee, currentLibrary.name)){
+          System.out.println(customer);
+        }
+        break;
+      default:
+        break;
+    }
   }
 
+  // Allow the user to checkout a specific item to a library customer
   private void checkoutItem()
   {
     java.util.Date today = new java.util.Date();
@@ -153,8 +164,10 @@ public class UserInterface
 	
   }
 
+  // Prompt the user to add a new item to the database.
   private void addItem()
   {
+    // We must read different fields for different media types
     String prompt = "What type of item is it? \n 1. Book \n 2. Movie \n 3. Audio \n";
     int type = readSelection(prompt, 3);
     switch (type) {
@@ -173,6 +186,7 @@ public class UserInterface
 	
   }
 
+  // Prompt the user to fill out information to add a new customer to the database
   private void addCustomer()
   {
     Customer c = new Customer();
@@ -193,6 +207,7 @@ public class UserInterface
     }
   }
 
+  // Prompt the user to delete an employee from the database
   private void removeEmployee()
   {
 	String id = readID("Enter 20 character employeeID to be removed: ");
@@ -204,9 +219,10 @@ public class UserInterface
     {
       System.out.println("Oops. There was an error deleting the employee.");
     }
-	
+
   }
 
+  // Prompt the user to fill out information to add a new book to the database
   private void addBook() 
   {
     Book b = new Book();
@@ -232,6 +248,7 @@ public class UserInterface
     }
   }
 
+  // Prompt the user to fill out information to add a new movie to the database
   private void addMovie()
   {
     Movie m = new Movie();
@@ -256,6 +273,7 @@ public class UserInterface
     }
   }
   
+  // Prompt the user to fill out information to add a new audio item to the database
   private void addAudio()
   {
     Audio a = new Audio();
@@ -282,6 +300,8 @@ public class UserInterface
     }
   }
 
+  // Read from standard input until a valid selection index is read, with 1 
+  // being the minimum index and maxSelection being the maximum index
   private int readSelection(String prompt, int maxSelection)
   {
     int selection = -1;
@@ -315,6 +335,7 @@ public class UserInterface
     return selection;
   }
 
+  // Read from standard input until a valid 20-character ID string is given.
   private String readID(String prompt)
   {
     String id = "";
@@ -337,6 +358,7 @@ public class UserInterface
     return id;
   }
 
+  // Read from standard input until a valid date is given
   private java.sql.Date readDate(String prompt)
   {
     SimpleDateFormat parser = new SimpleDateFormat("MMMM d, yyyy", Locale.ENGLISH);
@@ -362,6 +384,7 @@ public class UserInterface
     return new java.sql.Date(date.getTime());
   }
 
+  // Read from standard input until a valid integer with a range is given
   private int readInt(String prompt, int min, int max)
   {
     int result = -1;
